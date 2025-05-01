@@ -36,8 +36,16 @@
   </script>
 </head>
 <body>
-  <h1>🌞 Tdesign Daily Quote 🌞</h1>
+
   <div id="header-container"></div>
+
+<script>
+  fetch("header.html")
+    .then(res => res.text())
+    .then(data => {
+      document.getElementById("header-container").innerHTML = data;
+    });
+</script>
   <div class="quote-box">
     <div id="quote-text" class="quote-text">Đang tải...</div>
   </div>
@@ -63,13 +71,7 @@
     <a href="about.html">Liên hệ</a>
   </div>
 
-<script>
-  fetch("header.html")
-    .then(res => res.text())
-    .then(data => {
-      document.getElementById("header-container").innerHTML = data;
-    });
-</script>
+
 
 </body>
 </html>
