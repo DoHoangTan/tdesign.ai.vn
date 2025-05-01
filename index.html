@@ -47,7 +47,7 @@
   </div>
 
   <div id="g_id_onload"
-       data-client_id="YOUR_GOOGLE_CLIENT_ID"
+       data-client_id="812902619403-7o2d3r3c8j855fhhhljkquqotdbdic68.apps.googleusercontent.com"
        data-login_uri=""
        data-callback="handleCredentialResponse"
        data-auto_prompt="false">
@@ -55,17 +55,10 @@
   <div class="g_id_signin" data-type="standard"></div>
 
   <script>
-    const allowedEmails = ["your.email@gmail.com", "admin@example.com","dohoangtan.nt@gmail.com"];
-
     function handleCredentialResponse(response) {
       const decoded = parseJwt(response.credential);
       const email = decoded.email;
-      if (allowedEmails.includes(email)) {
-        alert("✅ Đăng nhập thành công với quyền bổ sung ảnh nền: " + email);
-        // Cho phép hiện form hoặc gửi ảnh nền
-      } else {
-        alert("⛔ Email không có quyền thêm ảnh nền: " + email);
-      }
+      alert("✅ Đăng nhập thành công với email: " + email);
     }
 
     function parseJwt(token) {
@@ -74,7 +67,6 @@
       const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
         return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
       }).join(''));
-
       return JSON.parse(jsonPayload);
     }
 
