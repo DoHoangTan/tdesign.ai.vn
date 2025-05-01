@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <title>Tdesign - Tạo ảnh chúc mừng</title>
   <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
   <style>
     body { font-family: Arial, sans-serif; background: #f4f4f4; margin: 0; padding: 20px; text-align: center; }
     header { display: flex; justify-content: center; align-items: center; margin-bottom: 20px; }
@@ -15,6 +16,7 @@
     input[type=text] { padding: 10px; font-size: 16px; width: 60%; margin-bottom: 10px; }
     button { padding: 10px 20px; font-size: 16px; cursor: pointer; margin: 5px; }
     select { padding: 8px; font-size: 16px; margin: 10px; }
+    #g_id_onload { margin: 10px auto; }
   </style>
 </head>
 <body>
@@ -37,14 +39,45 @@
 
   <div class="slider-container">
     <button class="slider-button" id="prevBtn" onclick="prevBackground()">← Trước</button>
-    <button class="slider-button" id="nextBtn" onclick="nextBackground()">Tiếp →</button>
+    <button class="slider-button" id="nextBtn" onclick="nextBackground()">→ Tiếp</button>
   </div>
 
   <div id="card">
     <div id="nameText">Tên người nhận</div>
   </div>
 
+  <div id="g_id_onload"
+       data-client_id="YOUR_GOOGLE_CLIENT_ID"
+       data-login_uri=""
+       data-callback="handleCredentialResponse"
+       data-auto_prompt="false">
+  </div>
+  <div class="g_id_signin" data-type="standard"></div>
+
   <script>
+    const allowedEmails = ["your.email@gmail.com", "admin@example.com"];
+
+    function handleCredentialResponse(response) {
+      const decoded = parseJwt(response.credential);
+      const email = decoded.email;
+      if (allowedEmails.includes(email)) {
+        alert("✅ Đăng nhập thành công với quyền bổ sung ảnh nền: " + email);
+        // Cho phép hiện form hoặc gửi ảnh nền
+      } else {
+        alert("⛔ Email không có quyền thêm ảnh nền: " + email);
+      }
+    }
+
+    function parseJwt(token) {
+      const base64Url = token.split('.')[1];
+      const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+      const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+      }).join(''));
+
+      return JSON.parse(jsonPayload);
+    }
+
     const translations = {
       vi: {
         title: "✨ Tdesign – Tạo ảnh chúc mừng ✨",
@@ -54,7 +87,7 @@
         placeholder: "Nhập tên...",
         defaultName: "Tên người nhận",
         prev: "← Trước",
-        next: "Tiếp →"
+        next: "→ Tiếp"
       },
       en: {
         title: "✨ Tdesign – Greeting Card Generator ✨",
@@ -64,7 +97,7 @@
         placeholder: "Enter name...",
         defaultName: "Recipient's Name",
         prev: "← Previous",
-        next: "Next →"
+        next: "→ Next"
       }
     };
 
