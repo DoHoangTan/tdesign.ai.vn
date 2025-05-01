@@ -2,7 +2,7 @@
 <html lang="vi">
 <head>
   <meta charset="UTF-8">
-  <title>Homepage</title>
+  <title>Homepage – Câu truyền động lực</title>
   <link rel="stylesheet" href="css/style.css">
   <script>
     async function fetchQuote() {
@@ -36,19 +36,7 @@
   </script>
 </head>
 <body>
-
   <div id="header-container"></div>
-
-<script>
-  fetch("header.html")
-    .then(res => res.text())
-    .then(data => {
-      document.getElementById("header-container").innerHTML = data;
-    });
-</script>
-  <div class="quote-box">
-    <div id="quote-text" class="quote-text">Đang tải...</div>
-  </div>
 
   <div>
     <label for="sizeSelector">Chọn kích thước ảnh:</label>
@@ -59,8 +47,16 @@
     </select>
   </div>
 
+  <div id="quote-container" style="background-image: url('https://i.imgur.com/EkYfLsa.jpg');">
+    <div id="quote-text">Đang tải câu truyền động lực...</div>
+  </div>
 
-
-
+  <script>
+    fetch("header.html")
+      .then(res => res.text())
+      .then(data => {
+        document.getElementById("header-container").innerHTML = data;
+      });
+  </script>
 </body>
 </html>
