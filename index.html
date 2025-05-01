@@ -55,10 +55,26 @@
   <div class="g_id_signin" data-type="standard"></div>
 
   <script>
-    function handleCredentialResponse(response) {
+    async function handleCredentialResponse(response) {
       const decoded = parseJwt(response.credential);
       const email = decoded.email;
-      alert("✅ Đăng nhập thành công với email: " + email);
+
+      const emailFileUrl = 'https://raw.githubusercontent.com/DoHoangTan/tdesign.ai.vn/main/dsEmail.txt';
+      let allowedEmails = [];
+      try {
+        const res = await fetch(emailFileUrl);
+        const text = await res.text();
+        allowedEmails = text.split(',').map(e => e.trim());
+      } catch (e) {
+        console.error('Không thể tải danh sách email:', e);
+      }
+
+      if (allowedEmails.includes(email)) {
+        alert("✅ Đăng nhập thành công với email: " + email);
+      } else {
+        alert("❌ Email không có quyền truy cập: " + email);
+        document.body.innerHTML = "<h3 style='color:red;'>Bạn không có quyền sử dụng chức năng này.</h3>";
+      }
     }
 
     function parseJwt(token) {
