@@ -1,1 +1,78 @@
 
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>Tạo mã QR | Tdesign</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background: #f0f0f0;
+      padding: 40px;
+    }
+    h1 {
+      color: #cc0000;
+    }
+    input {
+      padding: 10px;
+      width: 300px;
+      font-size: 16px;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      background: #0077cc;
+      color: white;
+      border: none;
+      margin-left: 10px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    #qrcode {
+      margin-top: 30px;
+    }
+    .nav {
+      margin-top: 40px;
+    }
+    .nav a {
+      display: inline-block;
+      margin: 10px;
+      padding: 10px 20px;
+      text-decoration: none;
+      background: #0077cc;
+      color: white;
+      border-radius: 5px;
+    }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
+</head>
+<body>
+  <h1>Tạo mã QR đơn giản</h1>
+  <input type="text" id="qrText" placeholder="Nhập nội dung để tạo mã QR" />
+  <button onclick="generateQR()">Tạo mã QR</button>
+  <div id="qrcode"></div>
+
+  <div class="nav">
+    <a href="index.html">Trang tổng</a>
+    <a href="ImageGenerator.html">Ghép ảnh</a>
+    <a href="removebg.html">Xóa nền</a>
+    <a href="qrcode.html">Tạo QR</a>
+    <a href="about.html">Liên hệ</a>
+  </div>
+
+  <script>
+    function generateQR() {
+      const text = document.getElementById("qrText").value.trim();
+      const container = document.getElementById("qrcode");
+      container.innerHTML = "";
+      if (text) {
+        QRCode.toCanvas(document.createElement("canvas"), text, { width: 200 }, function (err, canvas) {
+          if (!err) container.appendChild(canvas);
+        });
+      }
+    }
+  </script>
+</body>
+</html>
+
