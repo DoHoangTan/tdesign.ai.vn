@@ -1,62 +1,37 @@
-<!DOCTYPE html>
-<html lang="vi">
-<head>
-  <meta charset="UTF-8">
-  <title>Homepage – Câu truyền động lực</title>
-  <link rel="stylesheet" href="css/style.css">
-  <script>
-    async function fetchQuote() {
-      try {
-        const sheetUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQg_3_NR-NJ2LlFFcPqOitsapLFrs3x3UdIBBMKzcjRE5q78hlq_Z_bku7w_qx344TS0M-C7x2UtAP0/pub?output=csv";
-        const res = await fetch(sheetUrl);
-        const text = await res.text();
-        const rows = text.split("\n").map(row => row.split(","));
-        const today = new Date();
-        const baseDate = new Date("2025-05-01");
-        const diff = Math.floor((today - baseDate) / (1000 * 60 * 60 * 24));
-        const index = Math.max(0, diff);
-        if (rows.length > index) {
-          const quote = rows[index][1];
-          document.getElementById("quote-text").innerText = quote;
-        }
-      } catch (e) {
-        document.getElementById("quote-text").innerText = "Không thể tải nội dung. Vui lòng kiểm tra kết nối.";
+<script>
+  async function fetchQuote() {
+    try {
+      const sheetUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQg_3_NR-NJ2LlFFcPqOitsapLFrs3x3UdIBBMKzcjRE5q78hlq_Z_bku7w_qx344TS0M-C7x2UtAP0/pub?output=csv";
+      const res = await fetch(sheetUrl);
+      const text = await res.text();
+      const rows = text.split("\n").map(row => row.split(","));
+
+      const today = new Date();
+      const baseDate = new Date("2025-05-01");
+      const diff = Math.floor((today - baseDate) / (1000 * 60 * 60 * 24));
+      const rowIndex = Math.max(1, diff + 1); // +1 vì A1 là 01/05/2025
+
+      const row = rows[rowIndex];
+      if (row && row.length >= 3) {
+        const quote = row[1];
+        const imgUrl = row[2];
+        document.getElementById("quote-text").innerText = quote;
+        document.getElementById("quote-container").style.backgroundImage = `url('${imgUrl}')`;
+      } else {
+        document.getElementById("quote-text").innerText = "Không tìm thấy nội dung phù hợp.";
       }
+    } catch (e) {
+      document.getElementById("quote-text").innerText = "Lỗi tải dữ liệu.";
     }
+  }
 
-    function changeQuoteSize() {
-      const size = document.getElementById("sizeSelector").value;
-      const [width, height] = size.split("x");
-      const container = document.getElementById("quote-container");
-      container.style.width = width + "px";
-      container.style.height = height + "px";
-    }
+  function changeQuoteSize() {
+    const size = document.getElementById("sizeSelector").value;
+    const [width, height] = size.split("x");
+    const container = document.getElementById("quote-container");
+    container.style.width = width + "px";
+    container.style.height = height + "px";
+  }
 
-    window.onload = fetchQuote;
-  </script>
-</head>
-<body>
-  <div id="header-container"></div>
-
-  <div>
-    <label for="sizeSelector">Chọn kích thước ảnh:</label>
-    <select id="sizeSelector" onchange="changeQuoteSize()">
-      <option value="1080x1080">Vuông (1080x1080)</option>
-      <option value="1242x2208">Dọc (1242x2208)</option>
-      <option value="1280x720">Ngang (1280x720)</option>
-    </select>
-  </div>
-
-  <div id="quote-container" style="background-image: url('https://i.imgur.com/EkYfLsa.jpg');">
-    <div id="quote-text">Đang tải câu truyền động lực...</div>
-  </div>
-
-  <script>
-    fetch("header.html")
-      .then(res => res.text())
-      .then(data => {
-        document.getElementById("header-container").innerHTML = data;
-      });
-  </script>
-</body>
-</html>
+  window.onload = fetchQuote;
+</script>
