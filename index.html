@@ -2,86 +2,83 @@
 <html lang="vi">
 <head>
   <meta charset="UTF-8">
-  <title>Homepage - Ảnh truyền động lực</title>
-  <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+  <title>Homepage – Câu truyền động lực</title>
   <style>
-    body { font-family: 'Times New Roman', serif; text-align: center; padding: 20px; background-color: #f7f7f7; }
+    body {
+      font-family: 'Times New Roman', serif;
+      background-color: #f5f5f5;
+      text-align: center;
+      padding: 20px;
+    }
     #quote-container {
-      position: relative;
-      width: 1080px;
-      height: 1080px;
-      margin: auto;
-      border: 1px solid #ccc;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      margin: 30px auto;
+      padding: 40px;
+      background-image: url('https://i.imgur.com/EkYfLsa.jpg');
       background-size: cover;
       background-position: center;
-    }
-    #quote-text {
-      position: absolute;
-      bottom: 50px;
-      left: 50px;
-      right: 50px;
       color: white;
-      font-size: 36px;
-      text-shadow: 2px 2px 4px #000;
+      font-size: 28px;
+      width: 1080px;
+      height: 1080px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    }
+    select {
+      font-size: 16px;
+      padding: 6px;
+      margin-top: 10px;
     }
   </style>
-</head>
-<body>
-  <h1>Ảnh truyền động lực mỗi ngày</h1>
-  <div id="quote-container">
-    <div id="quote-text">Đang tải...</div>
-  </div>
-  <br>
-  <label for="size-select">Chọn kích thước ảnh:</label>
-  <select id="size-select">
-    <option value="square">Vuông (1080x1080)</option>
-    <option value="portrait">Dọc (1242x2208)</option>
-    <option value="landscape">Ngang (1280x720)</option>
-  </select>
-  <br><br>
-  <button onclick="downloadImage()">Tải ảnh</button>
-
   <script>
     async function fetchQuote() {
       try {
-        const res = await fetch("https://docs.google.com/spreadsheets/d/e/2PACX-1vQg_3_NR-NJ2LlFFcPqOitsapLFrs3x3UdIBBMKzcjRE5q78hlq_Z_bku7w_qx344TS0M-C7x2UtAP0/pub?output=csv");
+        const sheetUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQg_3_NR-NJ2LlFFcPqOitsapLFrs3x3UdIBBMKzcjRE5q78hlq_Z_bku7w_qx344TS0M-C7x2UtAP0/pub?output=csv";
+        const res = await fetch(sheetUrl);
         const text = await res.text();
-        const lines = text.split('\n').slice(1); // bỏ tiêu đề
-        const today = new Date();
-        const todayDate = today.getDate(); // dùng ngày để xác định dòng
-        const quoteLine = lines[todayDate % lines.length];
-        const parts = quoteLine.split(',');
-        document.getElementById('quote-text').innerText = parts[1] || 'Hãy bắt đầu ngày mới với năng lượng tích cực!';
+        const rows = text.split("\n").map(row => row.split(","));
 
-        // Gán ảnh nền mặc định (sau có thể random theo ngày)
-        document.getElementById('quote-container').style.backgroundImage = "url('https://i.imgur.com/EkYfLsa.jpg')";
+        const today = new Date();
+        const baseDate = new Date("2025-05-01");
+        const diff = Math.floor((today - baseDate) / (1000 * 60 * 60 * 24));
+        const index = Math.max(0, diff);
+
+        if (rows.length > index) {
+          const quote = rows[index][1];
+          document.getElementById("quote-text").innerText = quote;
+        }
       } catch (e) {
-        document.getElementById('quote-text').innerText = 'Không thể tải dữ liệu.';
-        console.error(e);
+        document.getElementById("quote-text").innerText = "Không thể tải nội dung. Vui lòng kiểm tra kết nối.";
       }
     }
 
-    function downloadImage() {
-      const size = document.getElementById('size-select').value;
-      const container = document.getElementById('quote-container');
-      let width = 1080, height = 1080;
-      if (size === 'portrait') { width = 1242; height = 2208; }
-      else if (size === 'landscape') { width = 1280; height = 720; }
-
-      html2canvas(container, {
-        width: width,
-        height: height,
-        useCORS: true
-      }).then(canvas => {
-        const link = document.createElement('a');
-        link.download = 'tdesign-daily.png';
-        link.href = canvas.toDataURL();
-        link.click();
-      });
+    function changeQuoteSize() {
+      const size = document.getElementById("sizeSelector").value;
+      const [width, height] = size.split("x");
+      const container = document.getElementById("quote-container");
+      container.style.width = width + "px";
+      container.style.height = height + "px";
     }
 
-    fetchQuote();
+    window.onload = fetchQuote;
   </script>
+</head>
+<body>
+  <h2>✨ Tdesign – Câu truyền động lực ✨</h2>
+
+  <div>
+    <label for="sizeSelector">Chọn kích thước ảnh:</label>
+    <select id="sizeSelector" onchange="changeQuoteSize()">
+      <option value="1080x1080">Vuông (1080x1080)</option>
+      <option value="1242x2208">Dọc (1242x2208)</option>
+      <option value="1280x720">Ngang (1280x720)</option>
+    </select>
+  </div>
+
+  <div id="quote-container">
+    <div id="quote-text">Đang tải câu truyền động lực...</div>
+  </div>
 </body>
 </html>
