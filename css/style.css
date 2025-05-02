@@ -36,3 +36,26 @@ h1 {
   color: white;
   border-radius: 5px;
 }
+#quote-container {
+  position: relative;
+  background-size: cover;
+  background-position: center;
+  width: 90vmin;   /* luôn vuông, giới hạn theo chiều nhỏ hơn */
+  height: 90vmin;
+  margin: 20px auto;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#quote-text {
+  font-size: 24px;
+  font-family: 'Times New Roman', serif;
+  color: white;
+  text-shadow: 2px 2px 4px black;
+  padding: 20px;
+  text-align: center;
+  line-height: 1.5;
+}
