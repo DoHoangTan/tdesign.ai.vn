@@ -53,6 +53,7 @@
     }
   </style>
   <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
+ <script src="https://cdn.jsdelivr.net/npm/qr-code-styling@1.5.0/lib/qr-code-styling.js"></script>
 </head>
 <body>
 
@@ -114,11 +115,19 @@
     const color = document.getElementById("qrColor").value;
     const size = parseInt(document.getElementById("qrSize").value);
 
+// thêm dots hoặc sqra
+  const padding = parseInt(document.getElementById("qrPadding").value);
+  const style = document.getElementById("qrStyle").value; // 'dots' hoặc 'square'
+
     if (!text) return alert("Vui lòng nhập nội dung!");
 
     const options = {
       width: size,
       margin: 0,
+      dotsOptions: {
+      type: style === "dots" ? "dots" : "square",
+      color: color
+                    },
       color: {
         dark: color,
         light: "#ffffff"
