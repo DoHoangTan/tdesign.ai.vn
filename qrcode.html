@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -72,10 +73,13 @@
     <option value="200">200px</option>
     <option value="300" selected>300px</option>
     <option value="400">400px</option>
+    <option value="600">600px</option>
   </select>
 </label>
 <br>
 <label>Upload logo (PNG): <input type="file" id="logoInput" accept="image/*"></label>
+<br>
+<label>Upload ảnh nền: <input type="file" id="bgInput" accept="image/*"></label>
 <br>
 <button onclick="generateQR()">Tạo mã QR</button>
 <button onclick="downloadQR()">Tải ảnh về</button>
@@ -85,17 +89,12 @@
   <img id="logoImage" class="logo" src="" style="display:none;">
 </div>
 
-<div class="nav">
-  <a href="index.html">Trang tổng</a>
-  <a href="ImageGenerator.html">Ghép ảnh</a>
-  <a href="removebg.html">Xóa nền</a>
-  <a href="qrcode.html">Tạo QR</a>
-  <a href="about.html">Liên hệ</a>
-</div>
+
 
 <script>
   const canvas = document.getElementById("qrCanvas");
   const logo = document.getElementById("logoImage");
+  let bgImage = null;
 
   function generateQR() {
     const text = document.getElementById("qrText").value.trim();
@@ -128,6 +127,17 @@
     reader.readAsDataURL(file);
   });
 
+  document.getElementById("bgInput").addEventListener("change", function (e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function (event) {
+      bgImage = new Image();
+      bgImage.src = event.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+
   function downloadQR() {
     const offscreenCanvas = document.createElement("canvas");
     const size = parseInt(document.getElementById("qrSize").value);
@@ -137,6 +147,11 @@
 
     ctx.fillStyle = "#ffffff";
     ctx.fillRect(0, 0, size, size);
+
+    if (bgImage && bgImage.complete) {
+      ctx.drawImage(bgImage, 0, 0, size, size);
+    }
+
     ctx.drawImage(canvas, 0, 0);
 
     if (logo.src && logo.style.display !== "none") {
