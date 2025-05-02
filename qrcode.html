@@ -76,10 +76,16 @@
     <option value="600">600px</option>
   </select>
 </label>
+<label>Style:
+  <select id="qrStyle">
+    <option value="square">Square</option>
+    <option value="dots">Dots</option>
+  </select>
+</label>
 <br>
 <label>Upload logo (PNG): <input type="file" id="logoInput" accept="image/*"></label><br>
 <label>Upload ảnh nền: <input type="file" id="bgInput" accept="image/*"></label><br>
-<label>Padding (khoảng trắng): 
+<label>Padding (khoảng cách QR ở giữa và ảnh nền): 
   <input type="range" min="1" max="600" value="10" id="qrPadding">
   <span id="paddingValue">10</span>px
 </label>
