@@ -5,38 +5,41 @@
   <title>Homepage – Câu truyền động lực</title>
   <link rel="stylesheet" href="css/style.css">
   <script>
-    async function fetchQuote() {
-      try {
-        const sheetUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQg_3_NR-NJ2LlFFcPqOitsapLFrs3x3UdIBBMKzcjRE5q78hlq_Z_bku7w_qx344TS0M-C7x2UtAP0/pub?output=csv";
-        const res = await fetch(sheetUrl);
-        const text = await res.text();
-        const rows = text.split("\n").map(row => row.split(","));
+  async function fetchQuote() {
+    try {
+      const csvUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQg_3_NR-NJ2LlFFcPqOitsapLFrs3x3UdIBBMKzcjRE5q78hlq_Z_bku7w_qx344TS0M-C7x2UtAP0/pub?output=csv";
+      const response = await fetch(csvUrl);
+      const data = await response.text();
+      const rows = data.split("\n").map(row => row.split(","));
 
-        const today = new Date();
-        const baseDate = new Date("2025-05-01");
-        const diff = Math.floor((today - baseDate) / (1000 * 60 * 60 * 24));
-        const index = Math.max(1, diff); // bắt đầu từ dòng 2
+      const today = new Date();
+      const base = new Date("2025-05-01");
+      const diff = Math.floor((today - base) / (1000 * 60 * 60 * 24)) + 1;
 
-        const quote = rows[index]?.[1] || "Không tìm thấy nội dung.";
-        const bg = rows[index]?.[2] || "https://i.imgur.com/EkYfLsa.jpg";
-
+      if (rows[diff]) {
+        const quote = rows[diff][1];  // Cột B
+        const bgUrl = rows[diff][2];  // Cột C
         document.getElementById("quote-text").innerText = quote;
-        document.getElementById("quote-container").style.backgroundImage = `url('${bg}')`;
-      } catch (e) {
-        document.getElementById("quote-text").innerText = "Không thể tải nội dung.";
+        document.getElementById("quote-container").style.backgroundImage = `url(${bgUrl})`;
+      } else {
+        document.getElementById("quote-text").innerText = "Không có dữ liệu hôm nay.";
       }
+    } catch (error) {
+      document.getElementById("quote-text").innerText = "Lỗi khi tải dữ liệu.";
     }
+  }
 
-    function changeQuoteSize() {
-      const size = document.getElementById("sizeSelector").value;
-      const [width, height] = size.split("x");
-      const container = document.getElementById("quote-container");
-      container.style.width = width + "px";
-      container.style.height = height + "px";
-    }
+  function changeQuoteSize() {
+    const size = document.getElementById("sizeSelector").value;
+    const [width, height] = size.split("x");
+    const container = document.getElementById("quote-container");
+    container.style.width = width + "px";
+    container.style.height = height + "px";
+  }
 
-    window.onload = fetchQuote;
-  </script>
+  window.onload = fetchQuote;
+</script>
+
 </head>
 <body>
   <!-- HEADER -->
