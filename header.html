@@ -1,11 +1,11 @@
 <div class="header">
-  <!-- Logo + Tiêu đề -->
-  <header style="display: flex; align-items: center; justify-content: center;">
-    <img src="https://raw.githubusercontent.com/DoHoangTan/tdesign.ai.vn/main/logo.svg" alt="logo" loading="lazy" style="width:40px;height:40px;margin-right:10px;">
+  <!-- Tiêu đề -->
+  <header style="text-align: center;">
     <h2 id="titleText">✨ Tdesign Daily Quote ✨</h2>
+    <div id="greetingText" style="margin-top: 5px; font-weight: bold; color: #007700;"></div>
   </header>
 
-  <!-- Google Đăng nhập -->
+  <!-- Đăng nhập Google -->
   <div id="g_id_onload"
        data-client_id="812902619403-7o2d3r3c8j855fhhhljkquqotdbdic68.apps.googleusercontent.com"
        data-callback="handleCredentialResponse"
@@ -13,18 +13,15 @@
   </div>
   <div class="g_id_signin" data-type="standard"></div>
 
-  <!-- Hiển thị email -->
-  <div id="user-email" style="margin-top: 10px; color: green; font-weight: bold;"></div>
-
-  <!-- Ngôn ngữ -->
-  <div>
-    <select onchange="changeLanguage(this.value)" id="languageSelector">
+  <!-- Chọn ngôn ngữ -->
+  <div style="margin-top: 10px;">
+    <select id="languageSelector" onchange="changeLanguage(this.value)">
       <option value="vi">🇻🇳 Tiếng Việt</option>
       <option value="en">🇺🇸 English</option>
     </select>
   </div>
 
-  <!-- Menu -->
+  <!-- Navigation -->
   <div class="nav">
     <a href="index.html">Trang tổng</a>
     <a href="ImageGenerator.html">Ghép ảnh</a>
@@ -34,15 +31,10 @@
   </div>
 </div>
 
-<!-- Script xử lý đăng nhập + ngôn ngữ -->
 <script>
   const translations = {
-    vi: {
-      title: "✨ Tdesign – Câu truyền động lực ✨",
-    },
-    en: {
-      title: "✨ Tdesign – Daily Motivation ✨",
-    }
+    vi: { title: "✨ Tdesign – Câu truyền động lực ✨", hello: "Chào" },
+    en: { title: "✨ Tdesign – Daily Motivation ✨", hello: "Hello" }
   };
 
   let currentLang = localStorage.getItem("lang") || "vi";
@@ -51,12 +43,13 @@
   function changeLanguage(lang) {
     currentLang = lang;
     localStorage.setItem("lang", lang);
-    document.getElementById("titleText").innerText = translations[lang].title;
-    // Reload nếu cần đồng bộ cả nội dung
-    // location.reload();
+    const t = translations[lang];
+    document.getElementById("titleText").innerText = t.title;
+    const email = localStorage.getItem("userEmail");
+    if (email) {
+      document.getElementById("greetingText").innerText = `${t.hello}, ${email}`;
+    }
   }
-
-  changeLanguage(currentLang);
 
   function parseJwt(token) {
     const base64Url = token.split('.')[1];
@@ -71,7 +64,7 @@
     const email = decoded.email || "";
     const name = decoded.name || "";
 
-    document.getElementById("user-email").innerText = `✅ Đăng nhập: ${name} (${email})`;
+    localStorage.setItem("userEmail", email);
 
     const emailFileUrl = 'https://raw.githubusercontent.com/DoHoangTan/tdesign.ai.vn/main/dsEmail.txt';
     let allowedEmails = [];
@@ -85,6 +78,20 @@
 
     if (!allowedEmails.includes(email)) {
       document.body.innerHTML = "<h3 style='color:red;'>Bạn không có quyền sử dụng chức năng này.</h3>";
+      return;
     }
+
+    // Hiển thị lời chào
+    const t = translations[currentLang];
+    document.getElementById("greetingText").innerText = `${t.hello}, ${email}`;
   }
+
+  // Hiển thị lại khi đã từng login
+  window.addEventListener("DOMContentLoaded", () => {
+    changeLanguage(currentLang);
+    const email = localStorage.getItem("userEmail");
+    if (email) {
+      document.getElementById("greetingText").innerText = `${translations[currentLang].hello}, ${email}`;
+    }
+  });
 </script>
