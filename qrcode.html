@@ -136,12 +136,12 @@
                                                 if (error) return console.error(error);
                                               });
                        */
-  qrCode = new QRCodeStyling({
+  let qrCode = new QRCodeStyling({
       width: size,
       height: size,
       type: "canvas",
       data: text,
-      image: logoDataURL || undefined,
+     image: logo.src || undefined,
       margin: 0,
       dotsOptions: {
         type: dotType,
@@ -157,9 +157,11 @@
       }
     });
 
+if (qrCode) qrCode.update({ ... }); // hoặc .clear(), tuỳ cách quản lý
     const preview = document.getElementById("preview");
     preview.innerHTML = "";
     qrCode.append(preview);
+
   
   }
 
