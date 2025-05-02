@@ -1,38 +1,75 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Homepage – Câu truyền động lực</title>
   <link rel="stylesheet" href="css/style.css" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <div id="header-container"></div>
+
+  <h2>✨ Tdesign – Câu truyền động lực ✨</h2>
+
+  <!-- Chọn kích thước + nút tải -->
+  <div style="margin-bottom: 10px;">
+    <label for="sizeSelector">Chọn kích thước ảnh: </label>
+    <select id="sizeSelector" onchange="changeQuoteSize()">
+      <option value="1080x1080">Vuông (1080x1080)</option>
+      <option value="1242x2208">Dọc (1242x2208)</option>
+      <option value="1280x720">Ngang (1280x720)</option>
+    </select>
+    <button onclick="downloadImage()">📥 Tải ảnh</button>
+  </div>
+
+  <!-- Vùng hiển thị ảnh + quote -->
+  <div id="quote-container">
+    <div id="quote-text" class="quote-text">Đang tải câu truyền động lực...</div>
+  </div>
+
+  <!-- FOOTER -->
+  <div id="footer-container"></div>
+
+  <!-- Script xử lý -->
   <script>
     async function fetchQuote() {
+      const quoteEl = document.getElementById("quote-text");
+      const containerEl = document.getElementById("quote-container");
+
+      quoteEl.innerText = "Đang tải câu truyền động lực...";
+
       try {
         const sheetUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQg_3_NR-NJ2LlFFcPqOitsapLFrs3x3UdIBBMKzcjRE5q78hlq_Z_bku7w_qx344TS0M-C7x2UtAP0/pub?output=csv";
-        const res = await fetch(sheetUrl);
-        const text = await res.text();
+        const response = await fetch(sheetUrl);
+        const text = await response.text();
         const rows = text.split("\n").map(row => row.split(","));
+
         const today = new Date();
-        const baseDate = new Date("2025-05-01");
-        const diff = Math.floor((today - baseDate) / (1000 * 60 * 60 * 24));
-        const index = Math.max(1, diff); // dòng 2 trở đi
+        const base = new Date("2025-05-01");
+        const index = Math.max(1, Math.floor((today - base) / (1000 * 60 * 60 * 24)));
 
-        const quote = rows[index]?.[1] || "Không tìm thấy nội dung.";
-        const bg = rows[index]?.[2] || "https://i.imgur.com/EkYfLsa.jpg";
+        const quote = rows[index]?.[1]?.trim();
+        const bgUrl = rows[index]?.[2]?.trim();
 
-        document.getElementById("quote-text").innerText = quote;
-        document.getElementById("quote-container").style.backgroundImage = `url('${bg}')`;
+        if (quote && bgUrl) {
+          quoteEl.innerText = quote;
+          containerEl.style.backgroundImage = `url('${bgUrl}')`;
+        } else {
+          quoteEl.innerText = "Không tìm thấy nội dung.";
+        }
       } catch (e) {
-        document.getElementById("quote-text").innerText = "Không thể tải nội dung.";
+        quoteEl.innerText = "Không thể tải nội dung. Vui lòng kiểm tra kết nối.";
       }
     }
 
     function changeQuoteSize() {
       const size = document.getElementById("sizeSelector").value;
-      const [w, h] = size.split("x");
+      const [width, height] = size.split("x");
       const container = document.getElementById("quote-container");
-      container.style.width = w + "px";
-      container.style.height = h + "px";
+      container.style.width = width + "px";
+      container.style.height = height + "px";
     }
 
     function downloadImage() {
@@ -44,39 +81,18 @@
       });
     }
 
+    // Load quote khi trang mở
     window.onload = fetchQuote;
-  </script>
-</head>
-<body>
-  <!-- HEADER -->
-  <div id="header-container"></div>
 
-  <h2>✨ Tdesign – Câu truyền động lực ✨</h2>
-
-  <div style="margin-bottom: 10px;">
-    <label for="sizeSelector">Chọn kích thước ảnh: </label>
-    <select id="sizeSelector" onchange="changeQuoteSize()">
-      <option value="1080x1080">Vuông (1080x1080)</option>
-      <option value="1242x2208">Dọc (1242x2208)</option>
-      <option value="1280x720">Ngang (1280x720)</option>
-    </select>
-    <button onclick="downloadImage()">📥 Tải ảnh</button>
-  </div>
-
-  <div id="quote-container">
-    <div id="quote-text" class="quote-text">Đang tải câu truyền động lực...</div>
-  </div>
-
-  <!-- FOOTER -->
-  <div id="footer-container"></div>
-
-  <script>
+    // Gắn header + footer
     fetch("header.html")
       .then(res => res.text())
       .then(data => document.getElementById("header-container").innerHTML = data);
+
     fetch("footer.html")
       .then(res => res.text())
       .then(data => document.getElementById("footer-container").innerHTML = data);
   </script>
+
 </body>
 </html>
