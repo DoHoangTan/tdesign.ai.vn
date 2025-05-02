@@ -147,44 +147,47 @@
   });
 
   function downloadQR() {
-    const size = parseInt(document.getElementById("qrSize").value);
-    const padding = parseInt(document.getElementById("qrPadding").value);
+  const size = parseInt(document.getElementById("qrSize").value);
+  const padding = parseInt(document.getElementById("qrPadding").value);
 
-    const outputSize = size + padding * 2;
-    const offscreenCanvas = document.createElement("canvas");
-    offscreenCanvas.width = outputSize;
-    offscreenCanvas.height = outputSize;
-    const ctx = offscreenCanvas.getContext("2d");
+  const outputSize = size + padding * 2;
+  const offscreenCanvas = document.createElement("canvas");
+  offscreenCanvas.width = outputSize;
+  offscreenCanvas.height = outputSize + 30; // thêm chiều cao cho dòng chữ
+  const ctx = offscreenCanvas.getContext("2d");
 
-    ctx.fillStyle = "#ffffff";
-    ctx.fillRect(0, 0, outputSize, outputSize);
+  // Nền trắng
+  ctx.fillStyle = "#ffffff";
+  ctx.fillRect(0, 0, offscreenCanvas.width, offscreenCanvas.height);
 
-    if (bgImage && bgImage.complete) {
-      ctx.drawImage(bgImage, 0, 0, outputSize, outputSize);
-    }
-
-    ctx.drawImage(canvas, padding, padding, size, size);
-
-    if (logo.src && logo.style.display !== "none") {
-      const logoSize = size * 0.2;
-      ctx.drawImage(logo, (outputSize - logoSize) / 2, (outputSize - logoSize) / 2, logoSize, logoSize);
-    }
-
-    const link = document.createElement("a");
-
-    const size = parseInt(document.getElementById("qrSize").value);
-    const fontSize = Math.floor(size / 20);
-
-    ctx.font = fontSize + "px Arial";
-    ctx.fillStyle = "#555";
-    ctx.textAlign = "center";
-    ctx.fillText("created by tdesign.ai.vn", size / 2, size - fontSize / 2);
-
-    
-    link.download = "qrcode.png";
-    link.href = offscreenCanvas.toDataURL();
-    link.click();
+  // Ảnh nền (nếu có)
+  if (bgImage && bgImage.complete) {
+    ctx.drawImage(bgImage, 0, 0, outputSize, outputSize);
   }
+
+  // QR chính
+  ctx.drawImage(canvas, padding, padding, size, size);
+
+  // Logo (nếu có)
+  if (logo.src && logo.style.display !== "none") {
+    const logoSize = size * 0.2;
+    ctx.drawImage(logo, (outputSize - logoSize) / 2, (outputSize - logoSize) / 2, logoSize, logoSize);
+  }
+
+  // Ghi chữ "created by tdesign.ai.vn"
+  const fontSize = Math.floor(size / 20);
+  ctx.font = fontSize + "px Arial";
+  ctx.fillStyle = "#555";
+  ctx.textAlign = "center";
+  ctx.fillText("created by tdesign.ai.vn", outputSize / 2, outputSize + 20);
+
+  // Tải ảnh
+  const link = document.createElement("a");
+  link.download = "qrcode.png";
+  link.href = offscreenCanvas.toDataURL();
+  link.click();
+}
+
 </script>
 
 </body>
