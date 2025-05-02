@@ -59,3 +59,11 @@ h1 {
   text-align: center;
   line-height: 1.5;
 }
+#quote-container {
+  transition: all 0.3s ease;
+}
+
+#quote-text {
+  transition: opacity 0.3s ease;
+}
+
