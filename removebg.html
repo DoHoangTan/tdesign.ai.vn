@@ -1,8 +1,66 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>Tdesign – Xóa nền ảnh</title>
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    .upload-container {
+      margin: 30px auto;
+      text-align: center;
+    }
+    #preview {
+      max-width: 90%;
+      margin-top: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.2);
+    }
+  </style>
+</head>
+<body>
 
+  <!-- Header -->
+  <div id="header-container"></div>
 
-<div id="header-container"></div>
-<script>
-  fetch("header.html")
-    .then(res => res.text())
-    .then(data => document.getElementById("header-container").innerHTML = data);
-</script>
+  <h2 style="margin-top: 30px;">🖼️ Xóa nền ảnh – Remove background</h2>
+
+  <div class="upload-container">
+    <input type="file" id="upload" accept="image/*">
+    <br><br>
+    <img id="preview" src="" alt="Xem trước ảnh..." hidden>
+    <p id="status" style="font-weight: bold; color: #007700;"></p>
+  </div>
+
+  <!-- Footer -->
+  <div id="footer-container"></div>
+
+  <!-- Scripts -->
+  <script>
+    fetch("header.html")
+      .then(res => res.text())
+      .then(data => document.getElementById("header-container").innerHTML = data);
+
+    fetch("footer.html")
+      .then(res => res.text())
+      .then(data => document.getElementById("footer-container").innerHTML = data);
+
+    const upload = document.getElementById("upload");
+    const preview = document.getElementById("preview");
+    const status = document.getElementById("status");
+
+    upload.addEventListener("change", () => {
+      const file = upload.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = () => {
+        preview.src = reader.result;
+        preview.hidden = false;
+        status.innerText = "⚠️ Đây là bản demo – ảnh chưa được xóa nền thật.";
+      };
+      reader.readAsDataURL(file);
+    });
+  </script>
+
+</body>
+</html>
