@@ -58,6 +58,19 @@
       margin-top: 10px;
       color: #333;
     }
+
+    .copy-btn {
+      margin-top: 10px;
+      font-size: 14px;
+      background-color: transparent;
+      border: none;
+      color: #007700;
+      cursor: pointer;
+      text-decoration: underline;
+    }
+    .copy-btn:hover {
+      color: #009900;
+    }
   </style>
 </head>
 <body>
@@ -70,6 +83,7 @@
     <img src="https://github.com/DoHoangTan/tdesign.ai.vn/blob/main/other/qrVietcombank.jpg?raw=true" alt="QR Vietcombank" class="qr-image">
     <div class="account-info">DO HOANG TAN</div>
     <div class="account-info">0071001079910 – Vietcombank</div>
+    <button class="copy-btn" onclick="copyAccount()">Sao chép số tài khoản</button>
   </div>
 
   <div id="footer-container"></div>
@@ -82,6 +96,16 @@
     fetch("footer.html").then(res => res.text()).then(data => {
       document.getElementById("footer-container").innerHTML = data;
     });
+
+    function copyAccount() {
+      const account = "0071001079910";
+      navigator.clipboard.writeText(account).then(() => {
+        alert("Đã sao chép số tài khoản: " + account);
+      }).catch(err => {
+        console.error("Lỗi sao chép: ", err);
+        alert("Không thể sao chép. Vui lòng thử lại.");
+      });
+    }
   </script>
 </body>
 </html>
