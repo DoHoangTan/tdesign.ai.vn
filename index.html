@@ -1,68 +1,79 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Homepage – Câu truyền động lực</title>
   <link rel="stylesheet" href="css/style.css">
-  <script>
-  async function fetchQuote() {
-    try {
-      const csvUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQg_3_NR-NJ2LlFFcPqOitsapLFrs3x3UdIBBMKzcjRE5q78hlq_Z_bku7w_qx344TS0M-C7x2UtAP0/pub?output=csv";
-      const response = await fetch(csvUrl);
-      const data = await response.text();
-      const rows = data.split("\n").map(row => row.split(","));
-
-      const today = new Date();
-      const base = new Date("2025-05-01");
-      const diff = Math.floor((today - base) / (1000 * 60 * 60 * 24)) + 1;
-
-      if (rows[diff]) {
-        const quote = rows[diff][1];  // Cột B
-        const bgUrl = rows[diff][2];  // Cột C
-        document.getElementById("quote-text").innerText = quote;
-        document.getElementById("quote-container").style.backgroundImage = `url(${bgUrl})`;
-      } else {
-        document.getElementById("quote-text").innerText = "Không có dữ liệu hôm nay.";
-      }
-    } catch (error) {
-      document.getElementById("quote-text").innerText = "Lỗi khi tải dữ liệu.";
-    }
-  }
-
-  function changeQuoteSize() {
-    const size = document.getElementById("sizeSelector").value;
-    const [width, height] = size.split("x");
-    const container = document.getElementById("quote-container");
-    container.style.width = width + "px";
-    container.style.height = height + "px";
-  }
-
-  window.onload = fetchQuote;
-</script>
-
 </head>
 <body>
-  <!-- HEADER -->
+
   <div id="header-container"></div>
 
   <h2>✨ Tdesign – Câu truyền động lực ✨</h2>
 
-  <div>
-    <label for="sizeSelector">Chọn kích thước ảnh:</label>
+  <div style="margin-bottom: 10px;">
+    <label for="sizeSelector">Chọn kích thước ảnh: </label>
     <select id="sizeSelector" onchange="changeQuoteSize()">
       <option value="1080x1080">Vuông (1080x1080)</option>
       <option value="1242x2208">Dọc (1242x2208)</option>
       <option value="1280x720">Ngang (1280x720)</option>
     </select>
+    <button onclick="downloadImage()">📥 Tải ảnh</button>
   </div>
 
-  <div id="quote-container" style="background-image: url('https://i.imgur.com/EkYfLsa.jpg');">
-    <div id="quote-text" class="quote-text">Đang tải câu truyền động lực...</div>
+  <div id="quote-container">
+    <div id="quote-text">Đang tải câu truyền động lực...</div>
   </div>
 
-  <!-- FOOTER -->
   <div id="footer-container"></div>
 
+  <script>
+    async function fetchQuote() {
+      try {
+        const csvUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQg_3_NR-NJ2LlFFcPqOitsapLFrs3x3UdIBBMKzcjRE5q78hlq_Z_bku7w_qx344TS0M-C7x2UtAP0/pub?output=csv";
+        const response = await fetch(csvUrl);
+        const data = await response.text();
+        const rows = data.split("\n").map(row => row.split(","));
+
+        const today = new Date();
+        const base = new Date("2025-05-01");
+        const diff = Math.floor((today - base) / (1000 * 60 * 60 * 24)) + 1;
+
+        if (rows[diff]) {
+          const quote = rows[diff][1];  // B
+          const bgUrl = rows[diff][2];  // C
+          document.getElementById("quote-text").innerText = quote;
+          document.getElementById("quote-container").style.backgroundImage = `url(${bgUrl})`;
+        } else {
+          document.getElementById("quote-text").innerText = "Không có dữ liệu hôm nay.";
+        }
+      } catch (error) {
+        document.getElementById("quote-text").innerText = "Lỗi khi tải dữ liệu.";
+      }
+    }
+
+    function changeQuoteSize() {
+      const size = document.getElementById("sizeSelector").value;
+      const [width, height] = size.split("x");
+      const container = document.getElementById("quote-container");
+      container.style.width = width + "px";
+      container.style.height = height + "px";
+    }
+
+    function downloadImage() {
+      const container = document.getElementById("quote-container");
+      html2canvas(container).then(canvas => {
+        const link = document.createElement("a");
+        link.download = "quote.png";
+        link.href = canvas.toDataURL();
+        link.click();
+      });
+    }
+
+    window.onload = fetchQuote;
+  </script>
+
+  <!-- Tải header + footer -->
   <script>
     fetch("header.html")
       .then(res => res.text())
@@ -72,5 +83,9 @@
       .then(res => res.text())
       .then(data => document.getElementById("footer-container").innerHTML = data);
   </script>
+
+  <!-- html2canvas để chụp DOM -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
 </body>
 </html>
