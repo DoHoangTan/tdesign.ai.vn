@@ -5,7 +5,8 @@
     <div id="greetingText" style="margin-top: 5px; font-weight: bold; color: #007700;"></div>
   </header>
 
-  <!-- Đăng nhập Google -->
+  <!-- Google Sign-In -->
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
   <div id="g_id_onload"
        data-client_id="812902619403-7o2d3r3c8j855fhhhljkquqotdbdic68.apps.googleusercontent.com"
        data-callback="handleCredentialResponse"
@@ -62,10 +63,10 @@
   async function handleCredentialResponse(response) {
     const decoded = parseJwt(response.credential);
     const email = decoded.email || "";
-    const name = decoded.name || "";
 
     localStorage.setItem("userEmail", email);
 
+    // Kiểm tra quyền
     const emailFileUrl = 'https://raw.githubusercontent.com/DoHoangTan/tdesign.ai.vn/main/dsEmail.txt';
     let allowedEmails = [];
     try {
@@ -86,7 +87,7 @@
     document.getElementById("greetingText").innerText = `${t.hello}, ${email}`;
   }
 
-  // Hiển thị lại khi đã từng login
+  // Tự động khôi phục sau reload
   window.addEventListener("DOMContentLoaded", () => {
     changeLanguage(currentLang);
     const email = localStorage.getItem("userEmail");
