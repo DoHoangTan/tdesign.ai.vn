@@ -21,6 +21,13 @@
 </head>
 <body>
   <header>
+<div id="header-container"></div>
+<script>
+  fetch("header.html")
+    .then(res => res.text())
+    .then(data => document.getElementById("header-container").innerHTML = data);
+</script>
+
     <img src="https://raw.githubusercontent.com/DoHoangTan/tdesign.ai.vn/main/logo.svg" alt="logo" loading="lazy">
     <h2 id="titleText">✨ Tdesign – Tạo ảnh chúc mừng ✨</h2>
   </header>
