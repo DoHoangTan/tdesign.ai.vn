@@ -10,13 +10,26 @@
       background: #f0f0f0;
       padding: 40px;
     }
-    h1 {
-      color: #cc0000;
-    }
     input, select {
-      padding: 10px;
+      padding: 8px;
       font-size: 16px;
       margin: 5px;
+    }
+    canvas {
+      margin-top: 20px;
+    }
+    #preview {
+      position: relative;
+      display: inline-block;
+    }
+    #preview img.logo {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 60px;
+      height: 60px;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
     }
     button {
       padding: 10px 20px;
@@ -26,24 +39,7 @@
       border: none;
       border-radius: 5px;
       cursor: pointer;
-    }
-    #qrcode {
-      margin-top: 30px;
-      position: relative;
-      display: inline-block;
-    }
-    #logoPreview {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      width: 50px;
-      height: 50px;
-      transform: translate(-50%, -50%);
-      object-fit: contain;
-      border-radius: 8px;
-    }
-    .nav {
-      margin-top: 40px;
+      margin: 10px 5px;
     }
     .nav a {
       display: inline-block;
@@ -55,7 +51,7 @@
       border-radius: 5px;
     }
   </style>
-  <script src="https://cdn.jsdelivr.net/npm/qrcodejs/qrcode.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
 </head>
 <body>
 
@@ -67,89 +63,90 @@
 </script>
 
 <h1>Tạo mã QR</h1>
-<input type="text" id="qrText" placeholder="Nhập nội dung để tạo mã QR">
-<select id="colorSelect">
-  <option value="#000000">Đen</option>
-  <option value="#1f4e78">Xanh đậm</option>
-  <option value="#d13438">Đỏ</option>
-  <option value="#107c10">Xanh lá</option>
-</select>
-<select id="formatSelect">
-  <option value="png">PNG</option>
-  <option value="jpg">JPG</option>
-  <option value="svg">SVG</option>
-</select>
-<input type="file" id="logoInput" accept="image/*">
-<br><br>
-<button onclick="generateQR()">Tạo mã QR</button>
-<button onclick="downloadQR()">Tải về</button>
 
-<div id="qrcode"></div>
+<input type="text" id="qrText" placeholder="Nhập nội dung (link, chữ...)">
+<br>
+<label>Màu QR: <input type="color" id="qrColor" value="#000000"></label>
+<label>Kích thước: 
+  <select id="qrSize">
+    <option value="200">200px</option>
+    <option value="300" selected>300px</option>
+    <option value="400">400px</option>
+  </select>
+</label>
+<br>
+<label>Upload logo (PNG): <input type="file" id="logoInput" accept="image/*"></label>
+<br>
+<button onclick="generateQR()">Tạo mã QR</button>
+<button onclick="downloadQR()">Tải ảnh về</button>
+
+<div id="preview">
+  <canvas id="qrCanvas"></canvas>
+  <img id="logoImage" class="logo" src="" style="display:none;">
+</div>
+
+<div class="nav">
+  <a href="index.html">Trang tổng</a>
+  <a href="ImageGenerator.html">Ghép ảnh</a>
+  <a href="removebg.html">Xóa nền</a>
+  <a href="qrcode.html">Tạo QR</a>
+  <a href="about.html">Liên hệ</a>
+</div>
 
 <script>
-  let logoBase64 = "";
-
-  document.getElementById("logoInput").addEventListener("change", function () {
-    const file = this.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = function (e) {
-        logoBase64 = e.target.result;
-      };
-      reader.readAsDataURL(file);
-    }
-  });
+  const canvas = document.getElementById("qrCanvas");
+  const logo = document.getElementById("logoImage");
 
   function generateQR() {
     const text = document.getElementById("qrText").value.trim();
-    const color = document.getElementById("colorSelect").value;
-    const container = document.getElementById("qrcode");
-    container.innerHTML = "";
+    const color = document.getElementById("qrColor").value;
+    const size = parseInt(document.getElementById("qrSize").value);
 
-    const canvas = document.createElement("canvas");
-    const size = 300;
-    canvas.width = size;
-    canvas.height = size;
+    if (!text) return alert("Vui lòng nhập nội dung!");
 
-    const qr = new QRCode(canvas, {
-      text: text,
+    const options = {
       width: size,
-      height: size,
-      colorDark: color,
-      colorLight: "#ffffff",
-      correctLevel: QRCode.CorrectLevel.H
-    });
-
-    setTimeout(() => {
-      const ctx = canvas.getContext("2d");
-      if (logoBase64) {
-        const img = new Image();
-        img.onload = function () {
-          const logoSize = size * 0.2;
-          ctx.drawImage(img, (size - logoSize) / 2, (size - logoSize) / 2, logoSize, logoSize);
-          container.innerHTML = "";
-          container.appendChild(canvas);
-        };
-        img.src = logoBase64;
-      } else {
-        container.innerHTML = "";
-        container.appendChild(canvas);
+      color: {
+        dark: color,
+        light: "#ffffff"
       }
-    }, 300);
+    };
+
+    QRCode.toCanvas(canvas, text, options, function (error) {
+      if (error) return console.error(error);
+    });
   }
 
-  function downloadQR() {
-    const canvas = document.querySelector("#qrcode canvas");
-    if (!canvas) return alert("Vui lòng tạo mã QR trước!");
+  document.getElementById("logoInput").addEventListener("change", function (e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function (event) {
+      logo.src = event.target.result;
+      logo.style.display = "block";
+    };
+    reader.readAsDataURL(file);
+  });
 
-    const format = document.getElementById("formatSelect").value;
-    let mime = "image/png";
-    if (format === "jpg") mime = "image/jpeg";
-    if (format === "svg") return alert("SVG chỉ hỗ trợ tải thủ công từ trình tạo khác.");
+  function downloadQR() {
+    const offscreenCanvas = document.createElement("canvas");
+    const size = parseInt(document.getElementById("qrSize").value);
+    offscreenCanvas.width = size;
+    offscreenCanvas.height = size;
+    const ctx = offscreenCanvas.getContext("2d");
+
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(0, 0, size, size);
+    ctx.drawImage(canvas, 0, 0);
+
+    if (logo.src && logo.style.display !== "none") {
+      const logoSize = size * 0.2;
+      ctx.drawImage(logo, (size - logoSize) / 2, (size - logoSize) / 2, logoSize, logoSize);
+    }
 
     const link = document.createElement("a");
-    link.download = "tdesign-qrcode." + format;
-    link.href = canvas.toDataURL(mime);
+    link.download = "qrcode.png";
+    link.href = offscreenCanvas.toDataURL();
     link.click();
   }
 </script>
