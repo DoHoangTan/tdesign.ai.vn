@@ -47,6 +47,13 @@
 </head>
 <body>
 
+<div id="header-container"></div>
+<script>
+  fetch("header.html")
+    .then(res => res.text())
+    .then(data => document.getElementById("header-container").innerHTML = data);
+</script>
+
 <h1>Tạo mã QR</h1>
 
 <input type="text" id="qrText" placeholder="Nhập nội dung (link, chữ...)">
