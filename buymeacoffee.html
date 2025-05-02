@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>Ủng hộ Tdesign</title>
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    .donate-container {
+      max-width: 600px;
+      margin: 40px auto;
+      padding: 20px;
+      background: #fffbe7;
+      border: 2px solid #ffd700;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      text-align: center;
+      font-family: Arial, sans-serif;
+    }
+
+    .donate-container h2 {
+      color: #cc0000;
+      margin-bottom: 10px;
+    }
+
+    .donate-container p {
+      font-size: 16px;
+      color: #444;
+      margin-bottom: 20px;
+    }
+
+    .donate-btn {
+      background-color: #FF813F;
+      color: white;
+      padding: 12px 24px;
+      font-size: 16px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-block;
+    }
+
+    .donate-btn:hover {
+      background-color: #ff944f;
+    }
+  </style>
+</head>
+<body>
+  <div id="header-container"></div>
+
+  <div class="donate-container">
+    <h2>Ủng hộ Tdesign ☕</h2>
+    <p>Nếu bạn thấy dự án hữu ích, hãy mời tôi một ly cà phê để động viên và giúp tôi duy trì hoạt động ❤️</p>
+    <a class="donate-btn" href="https://www.buymeacoffee.com/tdesign" target="_blank">Ủng hộ tại Buy Me a Coffee</a>
+  </div>
+
+  <div id="footer-container"></div>
+
+  <script>
+    fetch("header.html").then(res => res.text()).then(data => {
+      document.getElementById("header-container").innerHTML = data;
+    });
+
+    fetch("footer.html").then(res => res.text()).then(data => {
+      document.getElementById("footer-container").innerHTML = data;
+    });
+  </script>
+</body>
+</html>
