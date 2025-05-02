@@ -1,14 +1,90 @@
-<!-- header.html -->
-<h1>🌞 Tdesign Daily Quote 🌞</h1>
+<div class="header">
+  <!-- Logo + Tiêu đề -->
+  <header style="display: flex; align-items: center; justify-content: center;">
+    <img src="https://raw.githubusercontent.com/DoHoangTan/tdesign.ai.vn/main/logo.svg" alt="logo" loading="lazy" style="width:40px;height:40px;margin-right:10px;">
+    <h2 id="titleText">✨ Tdesign Daily Quote ✨</h2>
+  </header>
 
-<div class="quote-box">
-  <div id="quote-text" class="quote-text">Đang tải...</div>
+  <!-- Google Đăng nhập -->
+  <div id="g_id_onload"
+       data-client_id="812902619403-7o2d3r3c8j855fhhhljkquqotdbdic68.apps.googleusercontent.com"
+       data-callback="handleCredentialResponse"
+       data-auto_prompt="false">
+  </div>
+  <div class="g_id_signin" data-type="standard"></div>
+
+  <!-- Hiển thị email -->
+  <div id="user-email" style="margin-top: 10px; color: green; font-weight: bold;"></div>
+
+  <!-- Ngôn ngữ -->
+  <div>
+    <select onchange="changeLanguage(this.value)" id="languageSelector">
+      <option value="vi">🇻🇳 Tiếng Việt</option>
+      <option value="en">🇺🇸 English</option>
+    </select>
+  </div>
+
+  <!-- Menu -->
+  <div class="nav">
+    <a href="index.html">Trang tổng</a>
+    <a href="ImageGenerator.html">Ghép ảnh</a>
+    <a href="removebg.html">Xóa nền</a>
+    <a href="qrcode.html">Tạo QR</a>
+    <a href="about.html">Liên hệ</a>
+  </div>
 </div>
 
-<div class="nav">
-  <a href="index.html">Trang tổng</a>
-  <a href="ImageGenerator.html">Ghép ảnh</a>
-  <a href="removebg.html">Xóa nền</a>
-  <a href="qrcode.html">Tạo QR</a>
-  <a href="about.html">Liên hệ</a>
-</div>
+<!-- Script xử lý đăng nhập + ngôn ngữ -->
+<script>
+  const translations = {
+    vi: {
+      title: "✨ Tdesign – Câu truyền động lực ✨",
+    },
+    en: {
+      title: "✨ Tdesign – Daily Motivation ✨",
+    }
+  };
+
+  let currentLang = localStorage.getItem("lang") || "vi";
+  document.getElementById("languageSelector").value = currentLang;
+
+  function changeLanguage(lang) {
+    currentLang = lang;
+    localStorage.setItem("lang", lang);
+    document.getElementById("titleText").innerText = translations[lang].title;
+    // Reload nếu cần đồng bộ cả nội dung
+    // location.reload();
+  }
+
+  changeLanguage(currentLang);
+
+  function parseJwt(token) {
+    const base64Url = token.split('.')[1];
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    const jsonPayload = decodeURIComponent(atob(base64).split('').map(c =>
+      '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join(''));
+    return JSON.parse(jsonPayload);
+  }
+
+  async function handleCredentialResponse(response) {
+    const decoded = parseJwt(response.credential);
+    const email = decoded.email || "";
+    const name = decoded.name || "";
+
+    document.getElementById("user-email").innerText = `✅ Đăng nhập: ${name} (${email})`;
+
+    const emailFileUrl = 'https://raw.githubusercontent.com/DoHoangTan/tdesign.ai.vn/main/dsEmail.txt';
+    let allowedEmails = [];
+    try {
+      const res = await fetch(emailFileUrl);
+      const text = await res.text();
+      allowedEmails = text.split(',').map(e => e.trim());
+    } catch (e) {
+      console.error("Không thể tải danh sách email.");
+    }
+
+    if (!allowedEmails.includes(email)) {
+      document.body.innerHTML = "<h3 style='color:red;'>Bạn không có quyền sử dụng chức năng này.</h3>";
+    }
+  }
+</script>
