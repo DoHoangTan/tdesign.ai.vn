@@ -29,6 +29,7 @@
     <a href="removebg.html">Xóa nền</a>
     <a href="qrcode.html">Tạo QR</a>
     <a href="about.html">Liên hệ</a>
+    <a href="buymeacoffee.html">Donate ☕</a>
   </div>
 </div>
 
@@ -63,10 +64,9 @@
   async function handleCredentialResponse(response) {
     const decoded = parseJwt(response.credential);
     const email = decoded.email || "";
-
     localStorage.setItem("userEmail", email);
 
-    // Kiểm tra quyền
+    // Kiểm tra quyền từ dsEmail.txt
     const emailFileUrl = 'https://raw.githubusercontent.com/DoHoangTan/tdesign.ai.vn/main/dsEmail.txt';
     let allowedEmails = [];
     try {
@@ -87,7 +87,7 @@
     document.getElementById("greetingText").innerText = `${t.hello}, ${email}`;
   }
 
-  // Tự động khôi phục sau reload
+  // Khôi phục hiển thị
   window.addEventListener("DOMContentLoaded", () => {
     changeLanguage(currentLang);
     const email = localStorage.getItem("userEmail");
