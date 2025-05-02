@@ -62,6 +62,72 @@ h1 {
 #quote-container {
   transition: all 0.3s ease;
 }
+.header {
+  text-align: center;
+  margin-bottom: 30px;
+  padding: 10px;
+  background-color: #fdfdfd;
+  border-bottom: 1px solid #ddd;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.header h1 {
+  color: #cc0000;
+  font-size: 28px;
+  margin-bottom: 10px;
+}
+
+#google-login {
+  margin: 10px auto;
+  font-size: 14px;
+  color: #555;
+}
+
+#login-button {
+  background: #4285F4;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+#login-button:hover {
+  background: #3367d6;
+}
+
+#user-email {
+  margin-top: 5px;
+  font-size: 13px;
+  color: #333;
+}
+
+#languageSelector {
+  margin-top: 8px;
+  font-size: 14px;
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+
+.nav {
+  margin-top: 15px;
+}
+
+.nav a {
+  display: inline-block;
+  margin: 6px;
+  padding: 8px 16px;
+  text-decoration: none;
+  background: #0077cc;
+  color: white;
+  border-radius: 5px;
+  font-size: 14px;
+}
+
+.nav a:hover {
+  background: #005fa3;
+}
+
 
 #quote-text {
   transition: opacity 0.3s ease;
