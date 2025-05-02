@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -52,13 +53,21 @@
     }
   </style>
   <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/qr-code-styling@1.5.0/lib/qr-code-styling.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/qr-code-styling@1.5.0/lib/qr-code-styling.js"></script>
 </head>
 <body>
 
+<div id="header-container"></div>
+<script>
+  fetch("header.html")
+    .then(res => res.text())
+    .then(data => document.getElementById("header-container").innerHTML = data);
+</script>
+  
 <h1>Tạo mã QR</h1>
 
-<input type="text" id="qrText" placeholder="Nhập nội dung (link, chữ...)"><br>
+<input type="text" id="qrText" placeholder="Nhập nội dung (link, chữ...)">
+<br>
 <label>Màu QR: <input type="color" id="qrColor" value="#000000"></label>
 <label>Kích thước: 
   <select id="qrSize">
@@ -72,7 +81,7 @@
   <select id="qrStyle">
     <option value="square">Square</option>
     <option value="dots">Dots</option>
-    <option value="rounded">Rounded</option>
+     <option value="rounded">Rounded</option>
   </select>
 </label>
 <br>
@@ -86,40 +95,24 @@
 <button onclick="generateQR()">Tạo mã QR</button>
 <button onclick="downloadQR()">Tải ảnh về</button>
 
-<div id="preview"></div>
+<div id="preview">
+  <canvas id="qrCanvas"></canvas>
+  <img id="logoImage" class="logo" src="" style="display:none;">
+</div>
 
 <script>
+  const canvas = document.getElementById("qrCanvas");
   const logo = document.getElementById("logoImage");
   const paddingSlider = document.getElementById("qrPadding");
   const paddingDisplay = document.getElementById("paddingValue");
   let bgImage = null;
-  let qrCode;
 
   paddingSlider.addEventListener("input", () => {
     paddingDisplay.textContent = paddingSlider.value;
   });
 
-  document.getElementById("logoInput").addEventListener("change", function (e) {
-    const file = e.target.files[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = function (event) {
-      logo.src = event.target.result;
-      logo.style.display = "block";
-    };
-    reader.readAsDataURL(file);
-  });
-
-  document.getElementById("bgInput").addEventListener("change", function (e) {
-    const file = e.target.files[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = function (event) {
-      bgImage = new Image();
-      bgImage.src = event.target.result;
-    };
-    reader.readAsDataURL(file);
-  });
+  // 1. Khai báo biến toàn cục ở trên cùng script
+let qrCode; // <- khai báo ở đây để dùng được ở cả hai hàm
 
   function generateQR() {
     const text = document.getElementById("qrText").value.trim();
@@ -130,16 +123,29 @@
 
     if (!text) return alert("Vui lòng nhập nội dung!");
 
-    const dotType = style === "rounded" ? "dots" : style;
 
-    const logoSrc = document.getElementById("logoImage")?.src || undefined;
+  const dotType = style === "rounded" ? "dots" : style;
+  const logoSrc = document.getElementById("logoImage")?.src || undefined;
 
-    qrCode = new QRCodeStyling({
+                       /*                       const options = {
+                                                width: size,
+                                                margin: 0,
+                                                color: {
+                                                  dark: color,
+                                                  light: "#ffffff"
+                                                }
+                                              };
+                                          
+                                              QRCode.toCanvas(canvas, text, options, function (error) {
+                                                if (error) return console.error(error);
+                                              });
+                       */
+  qrCode = new QRCodeStyling({
       width: size,
       height: size,
       type: "canvas",
       data: text,
-      image: logoSrc,
+    image: logoSrc,
       margin: 0,
       dotsOptions: {
         type: dotType,
@@ -155,52 +161,87 @@
       }
     });
 
+
+    
+
+  document.getElementById("logoInput").addEventListener("change", function (e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function (event) {
+      logo.src = event.target.result;
+      logo.style.display = "block";
+                                    };
+    reader.readAsDataURL(file);
+                                                                            });
+
+  document.getElementById("bgInput").addEventListener("change", function (e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function (event) {
+      bgImage = new Image();
+      bgImage.src = event.target.result;
+                                      };
+    reader.readAsDataURL(file);
+  })
+
+/*sai
+if (qrCode) qrCode.update({ ... }); // hoặc .clear(), tuỳ cách quản lý
     const preview = document.getElementById("preview");
-    preview.innerHTML = ""; // clear old
+    preview.innerHTML = "";
     qrCode.append(preview);
-  }
+*/
+const preview = document.getElementById("preview");
+  preview.innerHTML = "";
+  qrCode.append(preview);
+  
+  };
 
   function downloadQR() {
-    const size = parseInt(document.getElementById("qrSize").value);
-    const padding = parseInt(document.getElementById("qrPadding").value);
-    const outputSize = size + padding * 2;
-    const offscreenCanvas = document.createElement("canvas");
-    offscreenCanvas.width = outputSize;
-    offscreenCanvas.height = outputSize + 30;
-    const ctx = offscreenCanvas.getContext("2d");
+  const size = parseInt(document.getElementById("qrSize").value);
+  const padding = parseInt(document.getElementById("qrPadding").value);
 
-    ctx.fillStyle = "#ffffff";
-    ctx.fillRect(0, 0, outputSize, outputSize);
+  const outputSize = size + padding * 2;
+  const offscreenCanvas = document.createElement("canvas");
+  offscreenCanvas.width = outputSize;
+  offscreenCanvas.height = outputSize + 30; // thêm chiều cao cho dòng chữ
+  const ctx = offscreenCanvas.getContext("2d");
 
-    if (bgImage && bgImage.complete) {
-      ctx.drawImage(bgImage, 0, 0, outputSize, outputSize);
-    }
+  // Nền trắng
+  ctx.fillStyle = "#ffffff";
+  ctx.fillRect(0, 0, outputSize, outputSize);
 
-    qrCode.getRawData("canvas").then(qrCanvas => {
-      ctx.drawImage(qrCanvas, padding, padding, size, size);
-
-      const logo = document.getElementById("logoImage");
-      if (logo && logo.src && logo.style.display !== "none") {
-        const logoSize = size * 0.2;
-        ctx.drawImage(logo, (outputSize - logoSize) / 2, (outputSize - logoSize) / 2, logoSize, logoSize);
-      }
-
-      const fontSize = Math.floor(size / 20);
-      ctx.font = fontSize + "px Arial";
-      ctx.fillStyle = "#555";
-      ctx.textAlign = "center";
-      ctx.fillText("created by tdesign.ai.vn", outputSize / 2, outputSize + 20);
-
-      const link = document.createElement("a");
-      link.download = "qrcode.png";
-      link.href = offscreenCanvas.toDataURL();
-      link.click();
-    });
+  // Ảnh nền (nếu có)
+  if (bgImage && bgImage.complete) {
+    ctx.drawImage(bgImage, 0, 0, outputSize, outputSize);
   }
-</script>
 
-<!-- Logo image element -->
-<img id="logoImage" class="logo" src="" style="display:none;">
+  // QR chính
+  ctx.drawImage(canvas, padding, padding, size, size);
+
+  // Logo (nếu có)
+  if (logo.src && logo.style.display !== "none") {
+    const logoSize = size * 0.2;
+    ctx.drawImage(logo, (outputSize - logoSize) / 2, (outputSize - logoSize) / 2, logoSize, logoSize);
+  }
+
+  // Ghi chữ "created by tdesign.ai.vn"
+  const fontSize = Math.floor(size / 20);
+  ctx.font = fontSize + "px Arial";
+  ctx.fillStyle = "#555";
+  ctx.textAlign = "center";
+  ctx.fillText("created by tdesign.ai.vn", outputSize / 2, outputSize + 20);
+
+  // Tải ảnh
+  const link = document.createElement("a");
+  link.download = "qrcode.png";
+  link.href = canvas.toDataURL();
+  link.href = offscreenCanvas.toDataURL();
+  link.click();
+}
+
+</script>
 
 </body>
 </html>
