@@ -56,13 +56,6 @@
 </head>
 <body>
 
-<div id="header-container"></div>
-<script>
-  fetch("header.html")
-    .then(res => res.text())
-    .then(data => document.getElementById("header-container").innerHTML = data);
-</script>
-
 <h1>Tạo mã QR</h1>
 
 <input type="text" id="qrText" placeholder="Nhập nội dung (link, chữ...)">
@@ -77,9 +70,12 @@
   </select>
 </label>
 <br>
-<label>Upload logo (PNG): <input type="file" id="logoInput" accept="image/*"></label>
-<br>
-<label>Upload ảnh nền: <input type="file" id="bgInput" accept="image/*"></label>
+<label>Upload logo (PNG): <input type="file" id="logoInput" accept="image/*"></label><br>
+<label>Upload ảnh nền: <input type="file" id="bgInput" accept="image/*"></label><br>
+<label>Padding (khoảng trắng): 
+  <input type="range" min="1" max="30" value="10" id="qrPadding">
+  <span id="paddingValue">10</span>px
+</label>
 <br>
 <button onclick="generateQR()">Tạo mã QR</button>
 <button onclick="downloadQR()">Tải ảnh về</button>
@@ -89,12 +85,16 @@
   <img id="logoImage" class="logo" src="" style="display:none;">
 </div>
 
-
-
 <script>
   const canvas = document.getElementById("qrCanvas");
   const logo = document.getElementById("logoImage");
+  const paddingSlider = document.getElementById("qrPadding");
+  const paddingDisplay = document.getElementById("paddingValue");
   let bgImage = null;
+
+  paddingSlider.addEventListener("input", () => {
+    paddingDisplay.textContent = paddingSlider.value;
+  });
 
   function generateQR() {
     const text = document.getElementById("qrText").value.trim();
@@ -105,6 +105,7 @@
 
     const options = {
       width: size,
+      margin: 0,
       color: {
         dark: color,
         light: "#ffffff"
@@ -139,24 +140,27 @@
   });
 
   function downloadQR() {
-    const offscreenCanvas = document.createElement("canvas");
     const size = parseInt(document.getElementById("qrSize").value);
-    offscreenCanvas.width = size;
-    offscreenCanvas.height = size;
+    const padding = parseInt(document.getElementById("qrPadding").value);
+
+    const outputSize = size + padding * 2;
+    const offscreenCanvas = document.createElement("canvas");
+    offscreenCanvas.width = outputSize;
+    offscreenCanvas.height = outputSize;
     const ctx = offscreenCanvas.getContext("2d");
 
     ctx.fillStyle = "#ffffff";
-    ctx.fillRect(0, 0, size, size);
+    ctx.fillRect(0, 0, outputSize, outputSize);
 
     if (bgImage && bgImage.complete) {
-      ctx.drawImage(bgImage, 0, 0, size, size);
+      ctx.drawImage(bgImage, 0, 0, outputSize, outputSize);
     }
 
-    ctx.drawImage(canvas, 0, 0);
+    ctx.drawImage(canvas, padding, padding, size, size);
 
     if (logo.src && logo.style.display !== "none") {
       const logoSize = size * 0.2;
-      ctx.drawImage(logo, (size - logoSize) / 2, (size - logoSize) / 2, logoSize, logoSize);
+      ctx.drawImage(logo, (outputSize - logoSize) / 2, (outputSize - logoSize) / 2, logoSize, logoSize);
     }
 
     const link = document.createElement("a");
