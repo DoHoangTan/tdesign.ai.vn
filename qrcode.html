@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -15,9 +16,21 @@
       font-size: 16px;
       margin: 5px;
     }
+    canvas {
+      margin-top: 20px;
+    }
     #preview {
       position: relative;
       display: inline-block;
+    }
+    #preview img.logo {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 60px;
+      height: 60px;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
     }
     button {
       padding: 10px 20px;
@@ -38,12 +51,8 @@
       color: white;
       border-radius: 5px;
     }
-    canvas {
-      display: block;
-      margin: 20px auto;
-    }
   </style>
-  <script src="https://cdn.jsdelivr.net/npm/qr-code-styling@1.5.0/lib/qr-code-styling.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
 </head>
 <body>
 
@@ -53,13 +62,13 @@
     .then(res => res.text())
     .then(data => document.getElementById("header-container").innerHTML = data);
 </script>
-
+  
 <h1>Tạo mã QR</h1>
 
 <input type="text" id="qrText" placeholder="Nhập nội dung (link, chữ...)">
 <br>
 <label>Màu QR: <input type="color" id="qrColor" value="#000000"></label>
-<label>Kích thước:
+<label>Kích thước: 
   <select id="qrSize">
     <option value="200">200px</option>
     <option value="300" selected>300px</option>
@@ -67,93 +76,114 @@
     <option value="600">600px</option>
   </select>
 </label>
-<label>Padding:
-  <input type="range" min="0" max="60" value="10" id="qrPadding">
-  <span id="paddingValue">10</span>px
-</label>
-<br>
-<label>Style:
-  <select id="qrStyle">
-    <option value="square">Square</option>
-    <option value="dots">Dots</option>
-  </select>
-</label>
 <br>
 <label>Upload logo (PNG): <input type="file" id="logoInput" accept="image/*"></label><br>
 <label>Upload ảnh nền: <input type="file" id="bgInput" accept="image/*"></label><br>
-
+<label>Padding (khoảng trắng): 
+  <input type="range" min="1" max="600" value="10" id="qrPadding">
+  <span id="paddingValue">10</span>px
+</label>
+<br>
 <button onclick="generateQR()">Tạo mã QR</button>
 <button onclick="downloadQR()">Tải ảnh về</button>
 
 <div id="preview">
-  <div id="canvasWrapper"></div>
+  <canvas id="qrCanvas"></canvas>
+  <img id="logoImage" class="logo" src="" style="display:none;">
 </div>
 
 <script>
-  const qrText = document.getElementById("qrText");
-  const qrColor = document.getElementById("qrColor");
-  const qrSize = document.getElementById("qrSize");
-  const qrStyle = document.getElementById("qrStyle");
-  const qrPadding = document.getElementById("qrPadding");
+  const canvas = document.getElementById("qrCanvas");
+  const logo = document.getElementById("logoImage");
+  const paddingSlider = document.getElementById("qrPadding");
   const paddingDisplay = document.getElementById("paddingValue");
-  const canvasWrapper = document.getElementById("canvasWrapper");
+  let bgImage = null;
 
-  let logoDataURL = "";
-  let qrCode = null;
-
-  qrPadding.addEventListener("input", () => {
-    paddingDisplay.textContent = qrPadding.value;
+  paddingSlider.addEventListener("input", () => {
+    paddingDisplay.textContent = paddingSlider.value;
   });
+
+  function generateQR() {
+    const text = document.getElementById("qrText").value.trim();
+    const color = document.getElementById("qrColor").value;
+    const size = parseInt(document.getElementById("qrSize").value);
+
+    if (!text) return alert("Vui lòng nhập nội dung!");
+
+    const options = {
+      width: size,
+      margin: 0,
+      color: {
+        dark: color,
+        light: "#ffffff"
+      }
+    };
+
+    QRCode.toCanvas(canvas, text, options, function (error) {
+      if (error) return console.error(error);
+    });
+  }
 
   document.getElementById("logoInput").addEventListener("change", function (e) {
     const file = e.target.files[0];
     if (!file) return;
     const reader = new FileReader();
     reader.onload = function (event) {
-      logoDataURL = event.target.result;
+      logo.src = event.target.result;
+      logo.style.display = "block";
     };
     reader.readAsDataURL(file);
   });
 
-  function generateQR() {
-    const data = qrText.value.trim();
-    if (!data) return alert("Vui lòng nhập nội dung!");
-
-    const color = qrColor.value;
-    const size = parseInt(qrSize.value);
-    const padding = parseInt(qrPadding.value);
-    const style = qrStyle.value;
-
-    qrCode = new QRCodeStyling({
-      width: size,
-      height: size,
-      data: data,
-      image: logoDataURL,
-      dotsOptions: {
-        color: color,
-        type: style
-      },
-      backgroundOptions: {
-        color: "#ffffff"
-      },
-      imageOptions: {
-        crossOrigin: "anonymous",
-        margin: 0
-      }
-    });
-
-    canvasWrapper.innerHTML = "";
-    qrCode.append(canvasWrapper);
-  }
+  document.getElementById("bgInput").addEventListener("change", function (e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function (event) {
+      bgImage = new Image();
+      bgImage.src = event.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
 
   function downloadQR() {
-    if (!qrCode) return;
-    qrCode.download({
-      name: "qrcode-tdesign",
-      extension: "png"
-    });
+    const size = parseInt(document.getElementById("qrSize").value);
+    const padding = parseInt(document.getElementById("qrPadding").value);
 
-    // Gợi ý: Nếu muốn chèn "created by tdesign.ai.vn" thì cần xử lý thêm bằng offscreen canvas (phức tạp hơn).
+    const outputSize = size + padding * 2;
+    const offscreenCanvas = document.createElement("canvas");
+    offscreenCanvas.width = outputSize;
+    offscreenCanvas.height = outputSize;
+    const ctx = offscreenCanvas.getContext("2d");
+
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(0, 0, outputSize, outputSize);
+
+    if (bgImage && bgImage.complete) {
+      ctx.drawImage(bgImage, 0, 0, outputSize, outputSize);
+    }
+
+    ctx.drawImage(canvas, padding, padding, size, size);
+
+    if (logo.src && logo.style.display !== "none") {
+      const logoSize = size * 0.2;
+      ctx.drawImage(logo, (outputSize - logoSize) / 2, (outputSize - logoSize) / 2, logoSize, logoSize);
+    }
+
+    const link = document.createElement("a");
+
+    const size = parseInt(document.getElementById("qrSize").value);
+    const fontSize = Math.floor(size / 20);
+
+    ctx.font = fontSize + "px Arial";
+    ctx.fillStyle = "#555";
+    ctx.textAlign = "center";
+    ctx.fillText("created by tdesign.ai.vn", size / 2, size - fontSize / 2);
+
+    
+    link.download = "qrcode.png";
+    link.href = offscreenCanvas.toDataURL();
+    link.click();
   }
 </script>
 
