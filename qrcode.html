@@ -56,6 +56,13 @@
 </head>
 <body>
 
+<div id="header-container"></div>
+<script>
+  fetch("header.html")
+    .then(res => res.text())
+    .then(data => document.getElementById("header-container").innerHTML = data);
+</script>
+  
 <h1>Tạo mã QR</h1>
 
 <input type="text" id="qrText" placeholder="Nhập nội dung (link, chữ...)">
@@ -73,7 +80,7 @@
 <label>Upload logo (PNG): <input type="file" id="logoInput" accept="image/*"></label><br>
 <label>Upload ảnh nền: <input type="file" id="bgInput" accept="image/*"></label><br>
 <label>Padding (khoảng trắng): 
-  <input type="range" min="1" max="30" value="10" id="qrPadding">
+  <input type="range" min="1" max="600" value="10" id="qrPadding">
   <span id="paddingValue">10</span>px
 </label>
 <br>
