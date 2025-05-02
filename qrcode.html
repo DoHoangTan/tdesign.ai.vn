@@ -96,12 +96,12 @@
 <button onclick="downloadQR()">Tải ảnh về</button>
 
 <div id="preview">
-  <canvas id="qrCanvas"></canvas>
+ 
   <img id="logoImage" class="logo" src="" style="display:none;">
 </div>
 
 <script>
-  const canvas = document.getElementById("qrCanvas");
+ 
   const logo = document.getElementById("logoImage");
   const paddingSlider = document.getElementById("qrPadding");
   const paddingDisplay = document.getElementById("paddingValue");
@@ -114,6 +114,28 @@
   // 1. Khai báo biến toàn cục ở trên cùng script
 let qrCode; // <- khai báo ở đây để dùng được ở cả hai hàm
 
+ document.getElementById("logoInput").addEventListener("change", function (e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function (event) {
+      logo.src = event.target.result;
+      logo.style.display = "block";
+                                    };
+    reader.readAsDataURL(file);
+                                                                            });
+
+  document.getElementById("bgInput").addEventListener("change", function (e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function (event) {
+      bgImage = new Image();
+      bgImage.src = event.target.result;
+                                      };
+    reader.readAsDataURL(file);
+  })
+
   function generateQR() {
     const text = document.getElementById("qrText").value.trim();
     const color = document.getElementById("qrColor").value;
@@ -125,7 +147,9 @@ let qrCode; // <- khai báo ở đây để dùng được ở cả hai hàm
 
 
   const dotType = style === "rounded" ? "dots" : style;
-  const logoSrc = document.getElementById("logoImage")?.src || undefined;
+    
+ const rawLogo = document.getElementById("logoImage");
+const logoSrc = rawLogo && rawLogo.style.display !== "none" ? rawLogo.src : undefined;
 
                        /*                       const options = {
                                                 width: size,
@@ -159,32 +183,12 @@ let qrCode; // <- khai báo ở đây để dùng được ở cả hai hàm
         crossOrigin: "anonymous",
         margin: 0
       }
-    });
+    })
 
 
     
 
-  document.getElementById("logoInput").addEventListener("change", function (e) {
-    const file = e.target.files[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = function (event) {
-      logo.src = event.target.result;
-      logo.style.display = "block";
-                                    };
-    reader.readAsDataURL(file);
-                                                                            });
-
-  document.getElementById("bgInput").addEventListener("change", function (e) {
-    const file = e.target.files[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = function (event) {
-      bgImage = new Image();
-      bgImage.src = event.target.result;
-                                      };
-    reader.readAsDataURL(file);
-  })
+ 
 
 /*sai
 if (qrCode) qrCode.update({ ... }); // hoặc .clear(), tuỳ cách quản lý
@@ -196,7 +200,7 @@ const preview = document.getElementById("preview");
   preview.innerHTML = "";
   qrCode.append(preview);
   
-  };
+  }
 
   function downloadQR() {
   const size = parseInt(document.getElementById("qrSize").value);
