@@ -1,108 +1,94 @@
-<!-- checkdata.html -->
 <!DOCTYPE html>
 <html lang="vi">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>OCR ảnh - Check Data</title>
-  <link rel="stylesheet" href="style.css">
+  <title>OCR Check Data</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; text-align: center; }
+    textarea { width: 100%; max-width: 500px; }
+    .flex-box { display: flex; justify-content: space-between; gap: 20px; margin-top: 20px; }
+    .flex-box div { flex: 1; }
+    #spellResult span { background: yellow; font-weight: bold; }
+  </style>
 </head>
 <body>
-  <div id="header-container"></div>
+  <h2>🖼️ OCR kiểm tra dữ liệu từ ảnh</h2>
+  <p>Chọn ảnh chứa văn bản, hệ thống sẽ quét và kiểm tra lỗi chính tả.</p>
 
-  <main style="text-align: center; padding: 30px;">
-    <h2>🖼️ OCR kiểm tra dữ liệu từ ảnh</h2>
-    <p>Tải lên ảnh có chứa bảng số liệu hoặc danh sách, hệ thống sẽ quét và hiển thị kết quả.</p>
+  <input type="file" id="imageUpload" accept="image/*"><br><br>
+  <button onclick="useTesseract()">🧠 Tesseract OCR</button>
+  <button onclick="useOCRSpace()">☁️ OCR.space API</button>
 
-    <input type="file" id="imageUpload" accept="image/*"><br><br>
-    <button onclick="processOCR()">🔍 Bắt đầu nhận dạng</button><br><br>
+  <div class="flex-box">
+    <div>
+      <h4>📄 Văn bản gốc (OCR)</h4>
+      <textarea id="ocrResult" rows="15"></textarea>
+    </div>
+    <div>
+      <h4>📝 Sau kiểm tra lỗi</h4>
+      <div id="spellResult" style="border: 1px solid #ccc; padding: 10px; min-height: 300px; background: #fdfdfd;"></div>
+    </div>
+  </div>
 
-    <textarea id="ocrResult" rows="10" style="width: 90%; max-width: 800px;"></textarea><br><br>
+  <br><button onclick="checkSpelling()">🧠 Kiểm tra lỗi chính tả</button>
 
-    <h4>📝 Kiểm tra lỗi chính tả</h4>
-    <textarea id="spellInput" rows="5" style="width: 90%; max-width: 800px;" placeholder="Dán nội dung OCR hoặc văn bản cần kiểm tra..."></textarea><br><br>
-    <button onclick="checkSpelling()">🧠 Kiểm tra lỗi</button>
-  
-<h5>Kết quả sau kiểm tra:</h5>
-<div id="spellResult" style="padding:10px; border:1px solid #ccc; max-width:800px; margin:auto; white-space:pre-wrap;"></div>
-
-
-  </main>
-
-  <div id="footer-container"></div>
-
-  <!-- OCR -->
   <script src="https://cdn.jsdelivr.net/npm/tesseract.js@2.1.5/dist/tesseract.min.js"></script>
   <script>
-    async function processOCR() {
+    async function useTesseract() {
       const file = document.getElementById('imageUpload').files[0];
-      if (!file) return alert('Vui lòng chọn ảnh.');
-
-      document.getElementById('ocrResult').value = '⏳ Đang nhận dạng...';
+      if (!file) return alert('Chọn ảnh!');
+      document.getElementById('ocrResult').value = '⏳ Đang nhận dạng bằng Tesseract...';
 
       const reader = new FileReader();
       reader.onload = async function () {
-        const { data: { text } } = await Tesseract.recognize(
-          reader.result,
-          'vie+eng',
-          { logger: m => console.log(m) }
-        );
+        const { data: { text } } = await Tesseract.recognize(reader.result, 'vie+eng');
         document.getElementById('ocrResult').value = text;
-        document.getElementById('spellInput').value = text;
       };
       reader.readAsDataURL(file);
     }
 
-   async function checkSpelling() {
-  const text = document.getElementById("spellInput").value.trim();
-  const resultDiv = document.getElementById("spellResult");
-  resultDiv.innerHTML = "⏳ Đang kiểm tra...";
+    async function useOCRSpace() {
+      const file = document.getElementById('imageUpload').files[0];
+      if (!file) return alert('Chọn ảnh!');
+      document.getElementById('ocrResult').value = '⏳ Đang nhận dạng bằng OCR.space...';
 
-  if (!text) {
-    alert("Vui lòng nhập nội dung.");
-    return;
-  }
+      const form = new FormData();
+      form.append("apikey", "helloworld"); // Dùng key test công khai
+      form.append("language", "vie");
+      form.append("file", file);
 
-  const res = await fetch("https://api.languagetool.org/v2/check", {
-    method: "POST",
-    headers: { "Content-Type": "application/x-www-form-urlencoded" },
-    body: `text=${encodeURIComponent(text)}&language=vi`
-  });
-  const data = await res.json();
-
-  if (!data.matches.length) {
-    resultDiv.innerHTML = "<p style='color:green;'>✅ Không phát hiện lỗi chính tả.</p>";
-    return;
-  }
-
-  // Highlight lỗi
-  let highlighted = text;
-  const offset = { value: 0 }; // track offset due to inserted tags
-
-  data.matches.forEach(match => {
-    const from = match.offset + offset.value;
-    const to = from + match.length;
-
-    const wrongWord = highlighted.slice(from, to);
-    const suggestion = match.replacements[0]?.value || "...";
-
-    const span = `<span style="background:yellow;" title="Gợi ý: ${suggestion}">${wrongWord}</span>`;
-    highlighted = highlighted.slice(0, from) + span + highlighted.slice(to);
-    offset.value += span.length - match.length;
-  });
-
-  resultDiv.innerHTML = highlighted;
-}
-
-    // Load header + footer
-    window.addEventListener("DOMContentLoaded", () => {
-      fetch("header.html").then(r => r.text()).then(t => {
-        document.getElementById("header-container").innerHTML = t;
+      const res = await fetch("https://api.ocr.space/parse/image", {
+        method: "POST", body: form
       });
-      fetch("footer.html").then(r => r.text()).then(t => {
-        document.getElementById("footer-container").innerHTML = t;
+      const data = await res.json();
+      const result = data?.ParsedResults?.[0]?.ParsedText || "Không nhận dạng được.";
+      document.getElementById("ocrResult").value = result;
+    }
+
+    async function checkSpelling() {
+      const text = document.getElementById("ocrResult").value;
+      if (!text.trim()) return;
+
+      const res = await fetch("https://api.languagetoolplus.com/v2/check", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: `text=${encodeURIComponent(text)}&language=vi`
       });
-    });
+
+      const data = await res.json();
+      let highlighted = text;
+      data.matches.forEach(m => {
+        const error = text.substring(m.offset, m.offset + m.length);
+        const suggest = m.replacements[0]?.value || '';
+        if (error && suggest) {
+          const re = new RegExp(error, 'g');
+          highlighted = highlighted.replace(re,
+            `<span title='Gợi ý: ${suggest}'>${error}</span>`);
+        }
+      });
+      document.getElementById("spellResult").innerHTML = highlighted;
+    }
   </script>
 </body>
 </html>
