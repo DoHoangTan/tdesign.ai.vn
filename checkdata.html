@@ -22,6 +22,12 @@
     <textarea id="ocrResult" rows="15" style="width: 90%; max-width: 800px;"></textarea>
   </main>
 
+// Sua phần ORC ảnh
+<h4>📝 Kiểm tra lỗi chính tả</h4>
+<textarea id="spellInput" rows="5" placeholder="Dán văn bản hoặc nội dung OCR vào đây..."></textarea>
+<button onclick="checkSpelling()">Kiểm tra lỗi</button>
+<div id="spellResult"></div>
+
   <!-- Footer chung -->
   <div id="footer-container"></div>
 
@@ -47,12 +53,8 @@
     }
 
 
-// Sua phần ORC ảnh
-<h4>📝 Kiểm tra lỗi chính tả</h4>
-<textarea id="spellInput" rows="5" placeholder="Dán văn bản hoặc nội dung OCR vào đây..."></textarea>
-<button onclick="checkSpelling()">Kiểm tra lỗi</button>
-<div id="spellResult"></div>
 
+// Sua phần ORC ảnh code
 async function checkSpelling() {
   const text = document.getElementById("spellInput").value;
   const res = await fetch("https://api.languagetoolplus.com/v2/check", {
