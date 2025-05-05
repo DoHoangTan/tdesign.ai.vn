@@ -1,0 +1,60 @@
+<!-- checkdata.html -->
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OCR ảnh - Check Data</title>
+  <link rel="stylesheet" href="style.css"> <!-- Nếu có style chung -->
+</head>
+<body>
+  <!-- Header chung -->
+  <div id="header-container"></div>
+
+  <main style="text-align: center; padding: 30px;">
+    <h2>🖼️ OCR kiểm tra dữ liệu từ ảnh</h2>
+    <p>Tải lên ảnh có chứa bảng số liệu hoặc danh sách, hệ thống sẽ quét và hiển thị kết quả.</p>
+
+    <input type="file" id="imageUpload" accept="image/*">
+    <br><br>
+    <button onclick="processOCR()">🔍 Bắt đầu nhận dạng</button>
+    <br><br>
+    <textarea id="ocrResult" rows="15" style="width: 90%; max-width: 800px;"></textarea>
+  </main>
+
+  <!-- Footer chung -->
+  <div id="footer-container"></div>
+
+  <!-- Tesseract.js cho OCR -->
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@2.1.5/dist/tesseract.min.js"></script>
+  <script>
+    async function processOCR() {
+      const file = document.getElementById('imageUpload').files[0];
+      if (!file) return alert('Vui lòng chọn ảnh.');
+
+      document.getElementById('ocrResult').value = '⏳ Đang nhận dạng...';
+
+      const reader = new FileReader();
+      reader.onload = async function () {
+        const { data: { text } } = await Tesseract.recognize(
+          reader.result,
+          'eng+vie',
+          { logger: m => console.log(m) }
+        );
+        document.getElementById('ocrResult').value = text;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    // Load header và footer
+    window.addEventListener("DOMContentLoaded", () => {
+      fetch("header.html").then(r => r.text()).then(t => {
+        document.getElementById("header-container").innerHTML = t;
+      });
+      fetch("footer.html").then(r => r.text()).then(t => {
+        document.getElementById("footer-container").innerHTML = t;
+      });
+    });
+  </script>
+</body>
+</html>
