@@ -61,11 +61,17 @@ document.getElementById("ocrResult").value = text;
 // Sua phần ORC ảnh code
 async function checkSpelling() {
   const text = document.getElementById("spellInput").value;
-  const res = await fetch("https://api.languagetoolplus.com/v2/check", {
+  if (!text.trim()) {
+    alert("Vui lòng nhập hoặc dán nội dung để kiểm tra.");
+    return;
+  }
+
+  const res = await fetch("https://api.languagetool.org/v2/check", {
     method: "POST",
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
     body: `text=${encodeURIComponent(text)}&language=vi`
   });
+
   const data = await res.json();
   const resultDiv = document.getElementById("spellResult");
 
@@ -77,6 +83,8 @@ async function checkSpelling() {
       "</ul>";
   }
 }
+
+    
     // Load header và footer
     window.addEventListener("DOMContentLoaded", () => {
       fetch("header.html").then(r => r.text()).then(t => {
