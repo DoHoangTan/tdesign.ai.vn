@@ -5,36 +5,29 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>OCR ảnh - Check Data</title>
-  <link rel="stylesheet" href="style.css"> <!-- Nếu có style chung -->
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <!-- Header chung -->
   <div id="header-container"></div>
 
   <main style="text-align: center; padding: 30px;">
     <h2>🖼️ OCR kiểm tra dữ liệu từ ảnh</h2>
     <p>Tải lên ảnh có chứa bảng số liệu hoặc danh sách, hệ thống sẽ quét và hiển thị kết quả.</p>
 
-    <input type="file" id="imageUpload" accept="image/*">
-    <br><br>
-    <button onclick="processOCR()">🔍 Bắt đầu nhận dạng</button>
-    <br><br>
-    <textarea id="ocrResult" rows="15" style="width: 90%; max-width: 800px;"></textarea>
+    <input type="file" id="imageUpload" accept="image/*"><br><br>
+    <button onclick="processOCR()">🔍 Bắt đầu nhận dạng</button><br><br>
 
-    Sua phần ORC ảnh
-<h4>📝 Kiểm tra lỗi chính tả</h4>
-<textarea id="spellInput" rows="5" placeholder="Dán văn bản hoặc nội dung OCR vào đây..."></textarea>
-<button onclick="checkSpelling()">Kiểm tra lỗi</button>
-<div id="spellResult"></div>
-    
+    <textarea id="ocrResult" rows="10" style="width: 90%; max-width: 800px;"></textarea><br><br>
+
+    <h4>📝 Kiểm tra lỗi chính tả</h4>
+    <textarea id="spellInput" rows="5" style="width: 90%; max-width: 800px;" placeholder="Dán nội dung OCR hoặc văn bản cần kiểm tra..."></textarea><br><br>
+    <button onclick="checkSpelling()">🧠 Kiểm tra lỗi</button>
+    <div id="spellResult" style="margin-top: 20px;"></div>
   </main>
 
- 
-
-  <!-- Footer chung -->
   <div id="footer-container"></div>
 
-  <!-- Tesseract.js cho OCR -->
+  <!-- OCR -->
   <script src="https://cdn.jsdelivr.net/npm/tesseract.js@2.1.5/dist/tesseract.min.js"></script>
   <script>
     async function processOCR() {
@@ -47,45 +40,44 @@
       reader.onload = async function () {
         const { data: { text } } = await Tesseract.recognize(
           reader.result,
-          'eng+vie',
+          'vie+eng',
           { logger: m => console.log(m) }
         );
         document.getElementById('ocrResult').value = text;
+        document.getElementById('spellInput').value = text;
       };
       reader.readAsDataURL(file);
     }
 
-document.getElementById("ocrResult").value = text;
-//document.getElementById("spellInput").value = text; // <- tự điền luôn
+    async function checkSpelling() {
+      const text = document.getElementById("spellInput").value.trim();
+      const resultDiv = document.getElementById("spellResult");
 
-// Sua phần ORC ảnh code
-async function checkSpelling() {
-  const text = document.getElementById("spellInput").value;
-  if (!text.trim()) {
-    alert("Vui lòng nhập hoặc dán nội dung để kiểm tra.");
-    return;
-  }
+      if (!text) {
+        alert("Vui lòng nhập văn bản để kiểm tra.");
+        return;
+      }
 
-  const res = await fetch("https://api.languagetool.org/v2/check", {
-    method: "POST",
-    headers: { "Content-Type": "application/x-www-form-urlencoded" },
-    body: `text=${encodeURIComponent(text)}&language=vi`
-  });
+      const res = await fetch("https://api.languagetool.org/v2/check", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: `text=${encodeURIComponent(text)}&language=vi`
+      });
 
-  const data = await res.json();
-  const resultDiv = document.getElementById("spellResult");
+      const data = await res.json();
 
-  if (data.matches.length === 0) {
-    resultDiv.innerHTML = "<p style='color:green;'>✅ Không phát hiện lỗi chính tả.</p>";
-  } else {
-    resultDiv.innerHTML = `<p>🔍 Phát hiện <b>${data.matches.length}</b> lỗi:</p><ul>` +
-      data.matches.map(m => `<li>${m.message} → <b>${m.replacements[0]?.value || '...'}</b></li>`).join("") +
-      "</ul>";
-  }
-}
+      if (!data.matches.length) {
+        resultDiv.innerHTML = "<p style='color:green;'>✅ Không phát hiện lỗi chính tả.</p>";
+      } else {
+        resultDiv.innerHTML = `<p>🔍 Phát hiện <b>${data.matches.length}</b> lỗi:</p><ul>` +
+          data.matches.map(m =>
+            `<li>${m.message}<br> 👉 <b>${m.replacements[0]?.value || '(gợi ý không có)'}</b></li>`
+          ).join('') +
+          "</ul>";
+      }
+    }
 
-    
-    // Load header và footer
+    // Load header + footer
     window.addEventListener("DOMContentLoaded", () => {
       fetch("header.html").then(r => r.text()).then(t => {
         document.getElementById("header-container").innerHTML = t;
