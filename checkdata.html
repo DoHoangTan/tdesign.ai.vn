@@ -20,13 +20,16 @@
     <button onclick="processOCR()">🔍 Bắt đầu nhận dạng</button>
     <br><br>
     <textarea id="ocrResult" rows="15" style="width: 90%; max-width: 800px;"></textarea>
-  </main>
 
- Sua phần ORC ảnh
+    Sua phần ORC ảnh
 <h4>📝 Kiểm tra lỗi chính tả</h4>
 <textarea id="spellInput" rows="5" placeholder="Dán văn bản hoặc nội dung OCR vào đây..."></textarea>
 <button onclick="checkSpelling()">Kiểm tra lỗi</button>
 <div id="spellResult"></div>
+    
+  </main>
+
+ 
 
   <!-- Footer chung -->
   <div id="footer-container"></div>
@@ -52,7 +55,8 @@
       reader.readAsDataURL(file);
     }
 
-
+document.getElementById("ocrResult").value = text;
+//document.getElementById("spellInput").value = text; // <- tự điền luôn
 
 // Sua phần ORC ảnh code
 async function checkSpelling() {
