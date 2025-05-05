@@ -22,7 +22,11 @@
     <h4>📝 Kiểm tra lỗi chính tả</h4>
     <textarea id="spellInput" rows="5" style="width: 90%; max-width: 800px;" placeholder="Dán nội dung OCR hoặc văn bản cần kiểm tra..."></textarea><br><br>
     <button onclick="checkSpelling()">🧠 Kiểm tra lỗi</button>
-    <div id="spellResult" style="margin-top: 20px;"></div>
+  
+<h5>Kết quả sau kiểm tra:</h5>
+<div id="spellResult" style="padding:10px; border:1px solid #ccc; max-width:800px; margin:auto; white-space:pre-wrap;"></div>
+
+
   </main>
 
   <div id="footer-container"></div>
@@ -49,33 +53,46 @@
       reader.readAsDataURL(file);
     }
 
-    async function checkSpelling() {
-      const text = document.getElementById("spellInput").value.trim();
-      const resultDiv = document.getElementById("spellResult");
+   async function checkSpelling() {
+  const text = document.getElementById("spellInput").value.trim();
+  const resultDiv = document.getElementById("spellResult");
+  resultDiv.innerHTML = "⏳ Đang kiểm tra...";
 
-      if (!text) {
-        alert("Vui lòng nhập văn bản để kiểm tra.");
-        return;
-      }
+  if (!text) {
+    alert("Vui lòng nhập nội dung.");
+    return;
+  }
 
-      const res = await fetch("https://api.languagetool.org/v2/check", {
-        method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: `text=${encodeURIComponent(text)}&language=vi`
-      });
+  const res = await fetch("https://api.languagetool.org/v2/check", {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: `text=${encodeURIComponent(text)}&language=vi`
+  });
+  const data = await res.json();
 
-      const data = await res.json();
+  if (!data.matches.length) {
+    resultDiv.innerHTML = "<p style='color:green;'>✅ Không phát hiện lỗi chính tả.</p>";
+    return;
+  }
 
-      if (!data.matches.length) {
-        resultDiv.innerHTML = "<p style='color:green;'>✅ Không phát hiện lỗi chính tả.</p>";
-      } else {
-        resultDiv.innerHTML = `<p>🔍 Phát hiện <b>${data.matches.length}</b> lỗi:</p><ul>` +
-          data.matches.map(m =>
-            `<li>${m.message}<br> 👉 <b>${m.replacements[0]?.value || '(gợi ý không có)'}</b></li>`
-          ).join('') +
-          "</ul>";
-      }
-    }
+  // Highlight lỗi
+  let highlighted = text;
+  const offset = { value: 0 }; // track offset due to inserted tags
+
+  data.matches.forEach(match => {
+    const from = match.offset + offset.value;
+    const to = from + match.length;
+
+    const wrongWord = highlighted.slice(from, to);
+    const suggestion = match.replacements[0]?.value || "...";
+
+    const span = `<span style="background:yellow;" title="Gợi ý: ${suggestion}">${wrongWord}</span>`;
+    highlighted = highlighted.slice(0, from) + span + highlighted.slice(to);
+    offset.value += span.length - match.length;
+  });
+
+  resultDiv.innerHTML = highlighted;
+}
 
     // Load header + footer
     window.addEventListener("DOMContentLoaded", () => {
