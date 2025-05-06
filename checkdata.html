@@ -64,9 +64,18 @@ if (file.size > 1024 * 1024) {  // 1MB = 1024*1024 bytes
   return;
 }
 // Kiểm tra dinh dạng ảnh
+
+/*
 const allowedTypes = ["image/png", "image/jpeg"];
 if (!allowedTypes.includes(file.type)) {
   document.getElementById("statusMsg").innerText = "❌ Định dạng ảnh không hỗ trợ.";
+  return;
+}
+*/
+const file = document.getElementById('imageUpload').files[0];
+if (!file.type.startsWith("image/")) {
+//  alert("Chỉ chấp nhận file ảnh (jpg, png, jpeg...)");
+ document.getElementById("statusMsg").innerText = "❌ Chỉ chấp nhận file ảnh (jpg, png, jpeg...)";
   return;
 }
 
