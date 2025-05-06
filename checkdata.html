@@ -54,7 +54,7 @@
 
    // nut orc
 async function useOCRSpace() {
- document.getElementById("statusMsg").innerText = "";// clear text
+// document.getElementById("statusMsg").innerText = "";// clear text
 
   const file = document.getElementById('imageUpload').files[0];
   if (!file) return alert('Vui lòng chọn ảnh.');
@@ -76,8 +76,8 @@ if (!allowedTypes.includes(file.type)) {
 */
 const file = document.getElementById('imageUpload').files[0];
 if (!file.type.startsWith("image/")) {
-//  alert("Chỉ chấp nhận file ảnh (jpg, png, jpeg...)");
- document.getElementById("statusMsg").innerText = "❌ Chỉ chấp nhận file ảnh (jpg, png, jpeg...)";
+  alert("Chỉ chấp nhận file ảnh (jpg, png, jpeg...)");
+// document.getElementById("statusMsg").innerText = "❌ Chỉ chấp nhận file ảnh (jpg, png, jpeg...)";
   return;
 }
 
