@@ -75,7 +75,7 @@ if (!allowedTypes.includes(file.type)) {
 
   const formData = new FormData();
   formData.append("apikey", "K83408541888957"); // ← Thay bằng API Key của bạn
-  formData.append("language", "vie");
+  formData.append("language", "vietnamese");
   formData.append("isOverlayRequired", false);
   formData.append("file", file);
 
@@ -87,7 +87,7 @@ if (!allowedTypes.includes(file.type)) {
 
     const result = await response.json();
     console.log("🔍 Phản hồi từ API:", result);
- document.getElementById("statusMsg").innerText = result;
+
 
     if (result.IsErroredOnProcessing) {
       resultBox.value = "❌ Không nhận dạng được. OCR.space API báo lỗi.";
