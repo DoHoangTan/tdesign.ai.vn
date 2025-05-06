@@ -49,24 +49,41 @@
       reader.readAsDataURL(file);
     }
 
-    async function useOCRSpace() {
-      const file = document.getElementById('imageUpload').files[0];
-      if (!file) return alert('Chọn ảnh!');
-      document.getElementById('ocrResult').value = '⏳ Đang nhận dạng bằng OCR.space...';
+   // nut orc
+async function processOCR_space() {
+  const file = document.getElementById('imageUpload').files[0];
+  if (!file) return alert('Vui lòng chọn ảnh.');
 
-      const form = new FormData();
-      form.append("apikey", "helloworld"); // Dùng key test công khai
-      form.append("language", "vie");
-      form.append("file", file);
+  const resultBox = document.getElementById('ocrResult');
+  resultBox.value = "⏳ Đang nhận dạng bằng OCR.space...";
 
-      const res = await fetch("https://api.ocr.space/parse/image", {
-        method: "POST", body: form
-      });
-      const data = await res.json();
-      const result = data?.ParsedResults?.[0]?.ParsedText || "Không nhận dạng được.";
-      document.getElementById("ocrResult").value = result;
-    }
+  const formData = new FormData();
+  formData.append("apikey", "K83408541888957"); // ← Thay bằng API Key của bạn
+  formData.append("language", "vie");
+  formData.append("isOverlayRequired", false);
+  formData.append("file", file);
 
+  const response = await fetch("https://api.ocr.space/parse/image", {
+    method: "POST",
+    body: formData
+  });
+
+  const result = await response.json();
+
+  if (result.IsErroredOnProcessing) {
+    resultBox.value = "❌ Không nhận dạng được. OCR.space API báo lỗi.";
+    return;
+  }
+
+  const text = result.ParsedResults?.[0]?.ParsedText || "";
+  resultBox.value = text;
+}
+
+
+
+
+
+//
 
     async function checkSpelling() {
   const text = document.getElementById("ocrResult").value;
