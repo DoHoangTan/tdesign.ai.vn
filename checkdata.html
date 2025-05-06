@@ -63,6 +63,12 @@ if (file.size > 1024 * 1024) {  // 1MB = 1024*1024 bytes
   document.getElementById("statusMsg").innerText = "❌ Ảnh vượt quá 1MB. Không thể nhận dạng.";
   return;
 }
+// Kiểm tra dinh dạng ảnh
+const allowedTypes = ["image/png", "image/jpeg"];
+if (!allowedTypes.includes(file.type)) {
+  document.getElementById("statusMsg").innerText = "❌ Định dạng ảnh không hỗ trợ.";
+  return;
+}
 
   const resultBox = document.getElementById('ocrResult');
   resultBox.value = "⏳ Đang nhận dạng bằng OCR.space...";
