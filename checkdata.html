@@ -28,6 +28,7 @@
     <div>
       <h4>📝 Sau kiểm tra lỗi</h4>
       <div id="spellResult" style="border: 1px solid #ccc; padding: 10px; min-height: 300px; background: #fdfdfd;"></div>
+
     </div>
   </div>
 
@@ -66,29 +67,38 @@
       document.getElementById("ocrResult").value = result;
     }
 
+
     async function checkSpelling() {
-      const text = document.getElementById("ocrResult").value;
-      if (!text.trim()) return;
+  const text = document.getElementById("ocrResult").value;
+  if (!text.trim()) return;
 
-      const res = await fetch("https://api.languagetoolplus.com/v2/check", {
-        method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: `text=${encodeURIComponent(text)}&language=vi`
-      });
+  const res = await fetch("https://api.languagetoolplus.com/v2/check", {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: `text=${encodeURIComponent(text)}&language=vi`
+  });
 
-      const data = await res.json();
-      let highlighted = text;
-      data.matches.forEach(m => {
-        const error = text.substring(m.offset, m.offset + m.length);
-        const suggest = m.replacements[0]?.value || '';
-        if (error && suggest) {
-          const re = new RegExp(error, 'g');
-          highlighted = highlighted.replace(re,
-            `<span title='Gợi ý: ${suggest}'>${error}</span>`);
-        }
-      });
-      document.getElementById("spellResult").innerHTML = highlighted;
-    }
+  const data = await res.json();
+  let resultHTML = "";
+  let lastIndex = 0;
+
+  data.matches.forEach(m => {
+    const from = m.offset;
+    const to = m.offset + m.length;
+    const suggestion = m.replacements[0]?.value || '';
+    const errorText = text.substring(from, to);
+
+    resultHTML += text.substring(lastIndex, from);
+    resultHTML += `<mark title="Gợi ý: ${suggestion}">${errorText}</mark>`;
+    lastIndex = to;
+  });
+
+  resultHTML += text.substring(lastIndex);
+  document.getElementById("spellResult").innerHTML = resultHTML;
+}
+
+
+    
   </script>
 </body>
 </html>
