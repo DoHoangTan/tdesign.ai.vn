@@ -54,6 +54,8 @@
 
    // nut orc
 async function useOCRSpace() {
+ document.getElementById("statusMsg").innerText = "";// clear text
+
   const file = document.getElementById('imageUpload').files[0];
   if (!file) return alert('Vui lòng chọn ảnh.');
 
